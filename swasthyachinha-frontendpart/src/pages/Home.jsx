@@ -23,7 +23,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <Link to="/login" className="bg-green-800 text-white text-center py-2 px-4 rounded hover:bg-green-900">
                 Login as Patient
               </Link>
@@ -33,11 +33,47 @@ export default function Home() {
               <Link to="/login" className="bg-green-500 text-white text-center py-2 px-4 rounded hover:bg-green-600">
                 Login as Pharmacy
               </Link>
-            </div>
+            </div> */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10">
+  {/* Feature 1 */}
+  <div className="flex flex-col items-center text-center p-4 bg-white shadow-md rounded-xl animate-fade-in">
+    <div className="text-4xl mb-2">📝</div>
+    <h3 className="text-lg font-semibold mb-1">Digital Prescriptions</h3>
+    <p className="text-gray-600 text-sm">
+      Say goodbye to paper. Generate and store prescriptions securely online.
+    </p>
+  </div>
 
-            <p className="text-sm text-gray-500 pt-4">
+  {/* Feature 2 */}
+  <div className="flex flex-col items-center text-center p-4 bg-white shadow-md rounded-xl animate-fade-in delay-200">
+    <div className="text-4xl mb-2">🤖</div>
+    <h3 className="text-lg font-semibold mb-1">Smart Suggestions</h3>
+    <p className="text-gray-600 text-sm">
+      Get intelligent recommendations and cost-effective alternatives instantly.
+    </p>
+  </div>
+
+  {/* Feature 3 */}
+  <div className="flex flex-col items-center text-center p-4 bg-white shadow-md rounded-xl animate-fade-in delay-400">
+    <div className="text-4xl mb-2">🔐</div>
+    <h3 className="text-lg font-semibold mb-1">Secure & Private</h3>
+    <p className="text-gray-600 text-sm">
+      All your data is encrypted and only accessible to authorized users.
+    </p>
+  </div>
+</div>
+
+{/* CTA Line */}
+<div className="mt-8 text-center animate-fade-in delay-600">
+  <p className="text-md font-medium text-gray-700 italic">
+    Secure. Efficient. Doctor-approved digital health made easy.
+  </p>
+</div>
+
+
+            {/* <p className="text-sm text-gray-500 pt-4">
               Start managing your health records digitally
-            </p>
+            </p> */}
           </div>
 
           {/* RIGHT IMAGE SECTION */}
@@ -177,7 +213,7 @@ export default function Home() {
 <section className="bg-white py-16">
   <div className="max-w-7xl mx-auto px-6">
     <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-      What People Are Saying
+      What We Aim to Achieve
     </h2>
 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -185,25 +221,25 @@ export default function Home() {
       {/* Testimonial 1 */}
       <div className="bg-[#f7f7f7] rounded-xl shadow-md p-6">
         <p className="text-gray-700 italic mb-4">
-          “SwasthyaChinha saved me from long queues at the hospital. I simply showed my QR code at the pharmacy and received my medicines quickly.”
+           “SwasthyaChinha aims to reduce patient waiting times by enabling quick digital prescriptions and pharmacy pickups via QR codes.”
         </p>
-        <div className="text-sm font-semibold text-green-800">– Ramesh K., Patient</div>
+        <div className="text-sm font-semibold text-green-800">– Project Goal</div>
       </div>
 
       {/* Testimonial 2 */}
       <div className="bg-[#f7f7f7] rounded-xl shadow-md p-6">
         <p className="text-gray-700 italic mb-4">
-          “As a doctor, I can now issue digital prescriptions in seconds. No more paper, and the system is very intuitive.”
+            “Our platform is being designed to help doctors streamline their prescription workflow and minimize paper usage.”
         </p>
-        <div className="text-sm font-semibold text-green-800">– Dr. Sita Sharma</div>
+        <div className="text-sm font-semibold text-green-800">– Development Team</div>
       </div>
 
       {/* Testimonial 3 */}
       <div className="bg-[#f7f7f7] rounded-xl shadow-md p-6">
         <p className="text-gray-700 italic mb-4">
-          “Managing patients and doctors digitally through SwasthyaChinha makes our hospital workflow faster and smarter.”
+           “Hospital admins will have better control over doctor registrations and system management, improving overall hospital efficiency.”
         </p>
-        <div className="text-sm font-semibold text-green-800">– Nabin K., Hospital Admin</div>
+        <div className="text-sm font-semibold text-green-800">– Mentor Feedback</div>
       </div>
     </div>
   </div>
@@ -213,3 +249,5 @@ export default function Home() {
     </>
   );
 }
+
+
