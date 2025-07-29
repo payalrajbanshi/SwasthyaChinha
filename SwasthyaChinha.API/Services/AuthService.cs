@@ -562,14 +562,25 @@ namespace SwasthyaChinha.API.Services
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 throw new Exception("Invalid credentials");
-
-            return new AuthResponseDto
+                var token = GenerateJwtToken(user);
+            var response= new AuthResponseDto
             {
                 Token = GenerateJwtToken(user),
                 Role = user.Role,
                 Email = user.Email,
                 UserId = user.Id.ToString()
             };
+             //  Add this: if the user is a HospitalAdmin, fetch their hospitalId
+    if (user.Role == "HospitalAdmin" && user.HospitalId.HasValue)
+    {
+        // var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.AdminId == user.Id);
+        // if (hospital != null)
+        {
+            response.HospitalId = user.HospitalId.Value;
+        }
+    }
+
+    return response;
         }
 
         public async Task<AuthResponseDto> RegisterHospitalAdminAsync(RegisterHospitalAdminDto dto)

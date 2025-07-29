@@ -169,19 +169,19 @@ namespace SwasthyaChinha.API.Controllers
             }
         }
 
-        [HttpPost("register/doctor")]
-        public async Task<IActionResult> RegisterDoctor([FromBody] RegisterDoctorDto model)
-        {
-            try
-            {
-                var response = await _authService.RegisterDoctorAsync(model);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        // [HttpPost("register/doctor")]
+        // public async Task<IActionResult> RegisterDoctor([FromBody] RegisterDoctorDto model)
+        // {
+        //     try
+        //     {
+        //         var response = await _authService.RegisterDoctorAsync(model);
+        //         return Ok(response);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return BadRequest(new { message = ex.Message });
+        //     }
+        // }
 
         [HttpPost("register/patient")]
         public async Task<IActionResult> RegisterPatient([FromBody] RegisterPatientDto model)

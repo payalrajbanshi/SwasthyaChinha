@@ -494,7 +494,7 @@ const Login = () => {
       localStorage.setItem("role", data.role);
       localStorage.setItem("userId", data.userId);
 
-         if (data.role.toLowerCase() === "hospitaladmin") {
+         if (data.role.toLowerCase() === "hospitaladmin" && data.hospitalId) {
         // Assuming backend returns hospitalId or fallback to userId if missing
         localStorage.setItem("hospitalId", data.userId);
       }

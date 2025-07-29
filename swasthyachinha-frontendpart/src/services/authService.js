@@ -25,7 +25,7 @@ const BASE_URL = "http://localhost:5099/api/auth"; // Update if your backend URL
 
 // 🔐 Login function
 export async function login(data) {
-  const res = await fetch(`${BASE_URL}/login`, {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
@@ -41,7 +41,7 @@ export async function login(data) {
 
 // 📝 Role-based registration function
 export async function registerUser(role, data) {
-  const res = await fetch(`${BASE_URL}/register/${role}`, {
+  const res = await fetch(`${BASE_URL}/auth/register/${role}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
@@ -54,4 +54,20 @@ export async function registerUser(role, data) {
 
   return await res.json();
 }
+// 👨‍⚕️ Dedicated doctor registration with token (HospitalAdmin only)
+export async function registerDoctor(data, token) {
+  const res = await fetch(`${BASE_URL}/hospital/register-doctor`, {
+    method: "POST",
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
 
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Doctor registration failed");
+  }
+  return await res.json();
+}
