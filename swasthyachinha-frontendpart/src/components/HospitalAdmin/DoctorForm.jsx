@@ -7,6 +7,7 @@ const DoctorForm = ({ onSuccess }) => {
     email: "",
     phoneNumber: "",
     specialty: "",
+    hospitalId: "",
     password: "",
   });
 
@@ -17,7 +18,9 @@ const DoctorForm = ({ onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const doctorData = { ...form, hospitalId };
+    const doctorData = { ...form, hospitalId: localStorage.getItem("hospitalId"),
+
+     };
 
     try {
       await registerDoctor(doctorData);

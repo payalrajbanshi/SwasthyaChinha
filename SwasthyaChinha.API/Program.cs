@@ -370,7 +370,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173","http://localhost:5099" )
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -389,6 +389,17 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllers();
 
 var app = builder.Build();
+// ✅ Warm up EF Core & apply migrations before handling requests
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    // Apply migrations automatically
+    db.Database.Migrate();
+
+    // Force a DB connection to warm up EF
+    db.Database.CanConnect();
+}
 
 // ✅ Middleware Pipeline
 if (app.Environment.IsDevelopment())
@@ -397,7 +408,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseCors("ReactPolicy");
 
 app.UseAuthentication();
