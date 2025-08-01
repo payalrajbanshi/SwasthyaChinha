@@ -19,6 +19,8 @@
 
 // }
 using SwasthyaChinha.API.Models.Auth;
+using SwasthyaChinha.API.DTOs;
+
 
 namespace SwasthyaChinha.API.Services.Interfaces
 {

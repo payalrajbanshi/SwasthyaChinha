@@ -614,7 +614,8 @@ namespace SwasthyaChinha.API.Services
                 Email = dto.Email,
                 LicenseNumber = dto.LicenseNumber,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Role = "Doctor"
+                Role = "Doctor",
+                Specialty = dto.Specialty
             };
 
             _context.Users.Add(user);

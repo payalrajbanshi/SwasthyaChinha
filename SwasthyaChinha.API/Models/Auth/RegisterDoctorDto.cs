@@ -10,5 +10,11 @@ namespace SwasthyaChinha.API.Models.Auth
         public string LicenseNumber { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+            [Required]
+        public string Specialty { get; set; }  // ✅ Added Specialty
+
+        [Required]
+        public Guid HospitalId { get; set; } 
+
     }
 }

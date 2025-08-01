@@ -59,6 +59,8 @@ using SwasthyaChinha.API.Data;
 using SwasthyaChinha.API.Models;
 using SwasthyaChinha.API.Services.Interfaces;
 using SwasthyaChinha.API.DTOs.Hospital;
+using SwasthyaChinha.API.DTOs.Auth;
+
 
 namespace SwasthyaChinha.API.Controllers
 {
@@ -113,6 +115,9 @@ namespace SwasthyaChinha.API.Controllers
             await _hospitalService.RegisterDoctorAsync(dto);
             return Ok("Doctor registered successfully.");
         }
+      
+
+
 
         // ✅ 4. Hospital Stats (Authorized)
         [Authorize(Roles = "HospitalAdmin")]

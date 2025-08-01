@@ -161,7 +161,8 @@
 
 // export default DoctorRegisterForm;
 import React, { useState } from "react";
-import axios from "axios";
+//import axios from "axios";
+import api from "../../services/api";
 
 const DoctorRegisterForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -191,19 +192,21 @@ const DoctorRegisterForm = ({ onSuccess }) => {
       if (!hospitalId) throw new Error("Hospital ID not found. Please log in as Hospital Admin.");
 
       await axios.post(
-        "http://localhost:5099/api/hospital/register-doctor",
+        // "http://localhost:5099/api/hospital/register-doctor",
+        "/hospital/register-doctor",
         {
           fullName: formData.fullName,
           email: formData.email,
           phoneNumber: formData.phoneNumber,
           specialty: formData.specialty,
           password: formData.password,
-          hospitalId: hospitalId, // ✅ Automatically included
+          // hospitalId: hospitalId, // ✅ Automatically included
+          hospitalId, // ✅ automatically included
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            //"Content-Type": "application/json",
           },
         }
       );
