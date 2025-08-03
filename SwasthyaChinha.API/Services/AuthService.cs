@@ -537,10 +537,10 @@ using SwasthyaChinha.API.Data;
 using SwasthyaChinha.API.Models;
 using SwasthyaChinha.API.Models.Auth;
 using SwasthyaChinha.API.Services.Interfaces;
+using SwasthyaChinha.API.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using SwasthyaChinha.API.DTOs;
 
 namespace SwasthyaChinha.API.Services
 {
@@ -558,40 +558,55 @@ namespace SwasthyaChinha.API.Services
         public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
         {
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == loginDto.EmailOrPhone || u.PhoneNumber == loginDto.EmailOrPhone);
+                .FirstOrDefaultAsync(u =>
+                    u.Email == loginDto.EmailOrPhone ||
+                    u.PhoneNumber == loginDto.EmailOrPhone);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 throw new Exception("Invalid credentials");
-                var token = GenerateJwtToken(user);
-            var response= new AuthResponseDto
+
+            var response = new AuthResponseDto
             {
                 Token = GenerateJwtToken(user),
                 Role = user.Role,
                 Email = user.Email,
                 UserId = user.Id.ToString()
             };
-             //  Add this: if the user is a HospitalAdmin, fetch their hospitalId
-    if (user.Role == "HospitalAdmin" && user.HospitalId.HasValue)
-    {
-        // var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.AdminId == user.Id);
-        // if (hospital != null)
-        {
-            response.HospitalId = user.HospitalId.Value;
-        }
-    }
 
-    return response;
+            // ✅ If HospitalAdmin, also return HospitalId
+            if (user.Role == "HospitalAdmin" && user.HospitalId.HasValue)
+            {
+                response.HospitalId = user.HospitalId.Value;
+            }
+
+            return response;
         }
 
         public async Task<AuthResponseDto> RegisterHospitalAdminAsync(RegisterHospitalAdminDto dto)
         {
+             // 1. Check if email already exists
+    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+    if (existingUser != null)
+        throw new Exception("Email is already registered.");
+
+    // 2. Create Hospital
+    var hospital = new Hospital
+    {
+        Name = dto.HospitalName,
+        Address = dto.Address // Make sure dto has Address property
+    };
+    _context.Hospitals.Add(hospital);
+    await _context.SaveChangesAsync(); // Save to get hospital.Id
             var user = new User
             {
-                FullName = dto.HospitalName,
+                FullName = dto.FullName,
                 Email = dto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Role = "HospitalAdmin",
-                HospitalName = dto.HospitalName
+                HospitalName = dto.HospitalName,
+                PhoneNumber = dto.PhoneNumber,
+                HospitalId = hospital.Id,
+                Address=dto.Address
             };
 
             _context.Users.Add(user);
@@ -602,7 +617,8 @@ namespace SwasthyaChinha.API.Services
                 Token = GenerateJwtToken(user),
                 Role = user.Role,
                 Email = user.Email,
-                UserId = user.Id.ToString()
+                UserId = user.Id.ToString(),
+                HospitalId = hospital.Id 
             };
         }
 
@@ -615,7 +631,8 @@ namespace SwasthyaChinha.API.Services
                 LicenseNumber = dto.LicenseNumber,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Role = "Doctor",
-                Specialty = dto.Specialty
+                Specialty = dto.Specialty,
+                HospitalId = dto.HospitalId // ✅ Link to hospital
             };
 
             _context.Users.Add(user);

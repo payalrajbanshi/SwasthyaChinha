@@ -22,7 +22,7 @@
 // src/services/auth.js
 import api from "./api"; // uses the centralized axios instance
 
-export async function login(data) {
+export async function loginUser(data) {
   // Explicitly map to what backend expects
   const response = await api.post("/auth/login", {
     emailOrPhone: data.emailOrPhone,

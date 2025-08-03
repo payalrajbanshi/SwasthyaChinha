@@ -65,7 +65,7 @@ using SwasthyaChinha.API.DTOs.Auth;
 namespace SwasthyaChinha.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/hospital")]
     public class HospitalController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -110,12 +110,22 @@ namespace SwasthyaChinha.API.Controllers
         // ✅ 3. Register Doctor (Authorized only for HospitalAdmin)
         [Authorize(Roles = "HospitalAdmin")]
         [HttpPost("register-doctor")]
-        public async Task<IActionResult> RegisterDoctor(RegisterDoctorDTO dto)
-        {
-            await _hospitalService.RegisterDoctorAsync(dto);
-            return Ok("Doctor registered successfully.");
-        }
-      
+        public async Task<IActionResult> RegisterDoctor([FromBody] RegisterDoctorDTO dto)
+        // {
+        //     await _hospitalService.RegisterDoctorAsync(dto);
+        //     return Ok("Doctor registered successfully.");
+        // }
+      {
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);  // ✅ This validates the request before continuing
+
+     await _hospitalService.RegisterDoctorAsync(dto); // Make sure _authService is injected
+
+    // if (!response.IsSuccess)
+    //     return BadRequest(response);    // Optional: send detailed message to frontend
+
+    return Ok(new { message = "Doctor Registered successfully."});
+}
 
 
 
