@@ -454,7 +454,7 @@ namespace SwasthyaChinha.API.Services
                 Role = "Doctor",
                 HospitalId = hospitalGuid,
                 Specialty = dto.Specialty,
-                PasswordHash = dto.Password // ⚠️ In production, hash passwords
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password) // ⚠️ In production, hash passwords
             };
 
             _context.Users.Add(doctor);
