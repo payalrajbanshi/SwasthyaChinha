@@ -5,7 +5,8 @@ namespace SwasthyaChinha.API.Services.Interfaces
     public interface IDoctorService
     {
         Task<DoctorProfileDTO> GetProfileAsync(string doctorId);
-        Task CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId);
+        Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId);
         Task<List<DoctorPatientDTO>> GetPatientsAsync(string doctorId);
+        
     }
 }

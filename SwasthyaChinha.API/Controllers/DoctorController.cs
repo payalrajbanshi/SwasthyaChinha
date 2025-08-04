@@ -95,9 +95,13 @@ namespace SwasthyaChinha.API.Controllers
         {
             var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            await _doctorService.CreatePrescriptionAsync(dto, doctorId);
+            string qrCodeBase64 = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
 
-            return Ok(new { message = "Prescription created" });
+            return Ok(new
+            {
+                message = "Prescription created",
+                qrCode=qrCodeBase64
+             });
         }
 
         [HttpGet("patients")]

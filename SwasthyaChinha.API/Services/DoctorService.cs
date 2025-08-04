@@ -347,7 +347,7 @@ namespace SwasthyaChinha.API.Services
             };
         }
 
-        public async Task CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
+        public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
         {
             // Parse HospitalId string to Guid
             if (!Guid.TryParse(dto.HospitalId, out Guid hospitalGuid))
@@ -372,6 +372,16 @@ namespace SwasthyaChinha.API.Services
 
             _context.Prescriptions.Add(prescription);
             await _context.SaveChangesAsync();
+                // ✅ Generate QR code with prescription ID
+    var qrService = new QRService();
+    var qrCodeBase64 = qrService.GenerateQRCode($"PRESC-{prescription.Id}");
+
+    // Save QR in DB if needed
+    prescription.QRCode = qrCodeBase64;
+    await _context.SaveChangesAsync();
+
+    // Return QR for frontend
+    return qrCodeBase64;
         }
 
         public async Task<List<DoctorPatientDTO>> GetPatientsAsync(string doctorId)
