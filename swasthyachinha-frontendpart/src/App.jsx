@@ -273,6 +273,9 @@ import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard";
 import HospitalDashboard from "./pages/HospitalAdmin/Dashboard";
 import RegisterDoctor from "./pages/HospitalAdmin/RegisterDoctor";
 import DoctorList from "./components/HospitalAdmin/DoctorList";
+import PrescriptionPage from "./pages/doctor/PrescriptionPage";
+
+
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -328,6 +331,7 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/doctor/prescribe" element={<PrescriptionPage />} />
 
       {/* 🛑 Fallback to Home */}
       <Route path="*" element={<Home />} />

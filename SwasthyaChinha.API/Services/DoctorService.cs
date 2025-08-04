@@ -342,7 +342,8 @@ namespace SwasthyaChinha.API.Services
                 FullName = doctor.FullName,
                 Email = doctor.Email,
                 Specialty = doctor.Specialty,
-                HospitalName = doctor.Hospital?.Name
+                HospitalName = doctor.Hospital?.Name,
+                 ProfileImageUrl = doctor.ProfileImageUrl
             };
         }
 

@@ -7,5 +7,6 @@ namespace SwasthyaChinha.API.DTOs.Doctor
         public string Email { get; set; }
         public string Specialty { get; set; }
         public string HospitalName { get; set; }
+        public string ProfileImageUrl { get; set; }
     }
 }

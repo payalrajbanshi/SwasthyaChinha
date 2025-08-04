@@ -27,7 +27,8 @@ namespace SwasthyaChinha.API.Models
         public Guid? HospitalId { get; set; }
 
         public Hospital? Hospital { get; set; }
-            public string? Address { get; set; }
-    public string? LogoUrl { get; set; }
+        public string? Address { get; set; }
+        public string? LogoUrl { get; set; }
+    public string? ProfileImageUrl { get; set; }
     }
 }

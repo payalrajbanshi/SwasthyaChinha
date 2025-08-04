@@ -6,4 +6,4 @@ namespace SwasthyaChinha.API.DTOs.Doctor
         public string Dosage { get; set; }
         public decimal Price { get; set; }
     }
-}
+} 
