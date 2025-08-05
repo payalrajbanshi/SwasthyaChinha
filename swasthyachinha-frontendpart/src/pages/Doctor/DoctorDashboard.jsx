@@ -130,9 +130,92 @@
 // };
 
 // export default DoctorDashboard;
+// import React, { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+
+// import Sidebar from "../../components/dashboard/Sidebar";
+// import DoctorProfileCard from "../../components/dashboard/DoctorProfileCard";
+// import StatsCard from "../../components/dashboard/StatsCard";
+// import ChartWidget from "../../components/dashboard/ChartWidget";
+// import PatientsTable from "../../components/dashboard/PatientsTable";
+// import PrescriptionQuickForm from "../../components/dashboard/PrescriptionQuickForm";
+
+
+// import { getDoctorProfile, getDoctorPatients } from "../../services/doctorService";
+
+// const DoctorDashboard = () => {
+//   const [doctor, setDoctor] = useState(null);
+//   const [patients, setPatients] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//     const navigate = useNavigate();
+
+
+//   useEffect(() => {
+//     const fetchDashboardData = async () => {
+//       try {
+//         const profileData = await getDoctorProfile();
+//         setDoctor(profileData);
+
+//         const patientsData = await getDoctorPatients();
+//         setPatients(patientsData);
+//       } catch (error) {
+//         console.error("Error loading dashboard data:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchDashboardData();
+//   }, []);
+
+//   if (loading) {
+//     return <div className="p-6">Loading dashboard...</div>;
+//   }
+
+//   return (
+//     <div className="flex">
+//       <Sidebar />
+//       <div className="flex-1 p-6 bg-gray-100">
+//         {/* Profile Overview */}
+//         <DoctorProfileCard doctor={doctor} />
+
+//         {/* Stats Cards */}
+//         <div className="grid grid-cols-3 gap-4 my-6">
+//           <StatsCard title="Total Patients" value={patients.length} />
+//           <StatsCard title="Total Prescriptions" value="--" /> {/* Future API */}
+//           <StatsCard title="Today's Patients" value="--" /> {/* Future API */}
+//         </div>
+
+//         {/* Main Content */}
+//         <div className="grid grid-cols-3 gap-4">
+//           <div className="col-span-2">
+//             <PatientsTable patients={patients} />
+//           </div>
+//           <div>
+//             <ChartWidget />
+//             <div className="mt-4">
+//                             {/* 🔘 Add New Prescription Button */}
+//               <button
+//                 onClick={() => navigate("/doctor/prescribe")}
+//                 className="bg-green-600 text-white px-4 py-2 rounded mb-4 w-full"
+//               >
+//                 ➕ Add New Prescription
+//               </button>
+//               <PrescriptionQuickForm />
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DoctorDashboard;
+// src/pages/doctor/DoctorDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Dashboard Components
 import Sidebar from "../../components/dashboard/Sidebar";
 import DoctorProfileCard from "../../components/dashboard/DoctorProfileCard";
 import StatsCard from "../../components/dashboard/StatsCard";
@@ -140,24 +223,24 @@ import ChartWidget from "../../components/dashboard/ChartWidget";
 import PatientsTable from "../../components/dashboard/PatientsTable";
 import PrescriptionQuickForm from "../../components/dashboard/PrescriptionQuickForm";
 
-
+// API Services
 import { getDoctorProfile, getDoctorPatients } from "../../services/doctorService";
 
 const DoctorDashboard = () => {
   const [doctor, setDoctor] = useState(null);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const profileData = await getDoctorProfile();
-        setDoctor(profileData);
+        const profileRes = await getDoctorProfile();
+        setDoctor(profileRes.data);
 
-        const patientsData = await getDoctorPatients();
-        setPatients(patientsData);
+        const patientsRes = await getDoctorPatients();
+        setPatients(patientsRes.data);
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       } finally {
@@ -173,34 +256,43 @@ const DoctorDashboard = () => {
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
+      {/* Sidebar */}
       <Sidebar />
+
+      {/* Main Content Area */}
       <div className="flex-1 p-6 bg-gray-100">
-        {/* Profile Overview */}
+        {/* Doctor Profile Card */}
         <DoctorProfileCard doctor={doctor} />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-4 my-6">
           <StatsCard title="Total Patients" value={patients.length} />
-          <StatsCard title="Total Prescriptions" value="--" /> {/* Future API */}
-          <StatsCard title="Today's Patients" value="--" /> {/* Future API */}
+          <StatsCard title="Total Prescriptions" value="—" /> {/* Future API */}
+          <StatsCard title="Today's Patients" value="—" /> {/* Future API */}
         </div>
 
-        {/* Main Content */}
+        {/* Main Dashboard Layout */}
         <div className="grid grid-cols-3 gap-4">
+          {/* Left Section: Patients Table */}
           <div className="col-span-2">
             <PatientsTable patients={patients} />
           </div>
+
+          {/* Right Section: Chart & Quick Prescription */}
           <div>
             <ChartWidget />
+
+            {/* Add New Prescription Button */}
             <div className="mt-4">
-                            {/* 🔘 Add New Prescription Button */}
               <button
                 onClick={() => navigate("/doctor/prescribe")}
                 className="bg-green-600 text-white px-4 py-2 rounded mb-4 w-full"
               >
                 ➕ Add New Prescription
               </button>
+
+              {/* Quick Prescription Form */}
               <PrescriptionQuickForm />
             </div>
           </div>
