@@ -341,10 +341,10 @@
 // };
 
 // export default PrescriptionPage;
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createPrescription } from "../../services/doctorService";
 import Sidebar from "../../components/dashboard/Sidebar";
+import { createPrescription, getDoctorProfile } from "../../services/doctorService";
 
 const PrescriptionPage = () => {
   const navigate = useNavigate();
@@ -352,40 +352,60 @@ const PrescriptionPage = () => {
   const [formData, setFormData] = useState({
     patientId: "",
     hospitalId: "",
-    medicines: [{ name: "", dosage: "" }]
+    medicines: [{ name: "", dosage: "" }],
   });
 
+  const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [qrCode, setQrCode] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+
+  const doctorSignature = localStorage.getItem("doctorSignature"); // Doctor signature stored locally
+
+  // Load doctor profile (auto-fill hospitalId, hospital name, doctor name)
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profile = await getDoctorProfile();
+        setDoctor(profile);
+        setFormData((prev) => ({
+          ...prev,
+          hospitalId: profile.hospitalId || "",
+        }));
+      } catch (error) {
+        console.error("Error fetching doctor profile:", error);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   // Handle general form input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle changes to medicine fields
+  // Handle medicine changes
   const handleMedicineChange = (index, field, value) => {
     const updated = [...formData.medicines];
     updated[index][field] = value;
     setFormData({ ...formData, medicines: updated });
   };
 
-  // Add a new medicine row
+  // Add new medicine row
   const addMedicine = () => {
     setFormData({
       ...formData,
-      medicines: [...formData.medicines, { name: "", dosage: "" }]
+      medicines: [...formData.medicines, { name: "", dosage: "" }],
     });
   };
 
-  // Remove a medicine row
+  // Remove medicine row
   const removeMedicine = (index) => {
     const updated = formData.medicines.filter((_, i) => i !== index);
     setFormData({ ...formData, medicines: updated });
   };
 
-  // Handle form submission
+  // Submit prescription
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -402,8 +422,8 @@ const PrescriptionPage = () => {
 
       setFormData({
         patientId: "",
-        hospitalId: "",
-        medicines: [{ name: "", dosage: "" }]
+        hospitalId: doctor?.hospitalId || "",
+        medicines: [{ name: "", dosage: "" }],
       });
     } catch (error) {
       console.error("Error creating prescription:", error);
@@ -418,8 +438,35 @@ const PrescriptionPage = () => {
       <Sidebar />
 
       <div className="flex-1 p-6">
-        <h1 className="text-2xl font-bold mb-4">Create Prescription</h1>
+        {/* Prescription Header */}
+        {doctor && (
+          <div className="bg-white border rounded shadow p-6 mb-6">
+            <h1 className="text-2xl font-bold text-center uppercase">
+              {doctor.hospitalName || "Hospital Name"}
+            </h1>
+            <p className="text-center text-sm text-gray-600">
+              {doctor.hospitalAddress || "Hospital Address"}
+            </p>
+            <div className="mt-4 flex justify-between items-center">
+              <div>
+                <p className="font-semibold">Dr. {doctor.fullName}</p>
+                <p className="text-sm text-gray-600">{doctor.specialty}</p>
+              </div>
+              {doctorSignature && (
+                <div>
+                  <img
+                    src={doctorSignature}
+                    alt="Doctor Signature"
+                    className="h-12 object-contain"
+                  />
+                  <p className="text-xs text-gray-500 text-center">Signature</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
+        {/* Prescription Form */}
         <form
           onSubmit={handleSubmit}
           className="bg-white p-6 rounded shadow-md max-w-3xl"
@@ -432,19 +479,7 @@ const PrescriptionPage = () => {
               name="patientId"
               value={formData.patientId}
               onChange={handleChange}
-              className="border rounded p-2 w-full"
-              required
-            />
-          </div>
-
-          {/* Hospital ID */}
-          <div className="mb-4">
-            <label className="block font-medium mb-1">Hospital ID</label>
-            <input
-              type="text"
-              name="hospitalId"
-              value={formData.hospitalId}
-              onChange={handleChange}
+              placeholder="Enter patient GUID or search"
               className="border rounded p-2 w-full"
               required
             />
@@ -499,7 +534,7 @@ const PrescriptionPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded w-full"
+            className="bg-green-600 text-white px-4 py-2 rounded w-full"
           >
             {loading ? "Sending..." : "Send Prescription"}
           </button>
@@ -517,7 +552,7 @@ const PrescriptionPage = () => {
             <img
               src={`data:image/png;base64,${qrCode}`}
               alt="Prescription QR"
-              className="w-40 h-40 border"
+              className="w-40 h-40 border mx-auto"
             />
             <button
               onClick={() => navigate("/doctor/dashboard")}
