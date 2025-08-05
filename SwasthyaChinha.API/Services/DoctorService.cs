@@ -343,7 +343,9 @@ namespace SwasthyaChinha.API.Services
                 Email = doctor.Email,
                 Specialty = doctor.Specialty,
                 HospitalName = doctor.Hospital?.Name,
-                 ProfileImageUrl = doctor.ProfileImageUrl
+                HospitalAddress = doctor.Hospital?.Address,
+                ProfileImageUrl = doctor.ProfileImageUrl,
+                 SignatureUrl = doctor.SignatureUrl 
             };
         }
 
