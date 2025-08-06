@@ -345,7 +345,8 @@ namespace SwasthyaChinha.API.Services
                 HospitalName = doctor.Hospital?.Name,
                 HospitalAddress = doctor.Hospital?.Address,
                 ProfileImageUrl = doctor.ProfileImageUrl,
-                 SignatureUrl = doctor.SignatureUrl 
+                SignatureUrl = doctor.SignatureUrl,
+                 HospitalId = doctor.HospitalId ?? Guid.Empty,
             };
         }
 
