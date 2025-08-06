@@ -1,23 +1,4 @@
-// import React from "react";
-// import { useNavigate } from "react-router-dom";
 
-// const PrescriptionQuickForm = () => {
-//   const navigate = useNavigate();
-
-//   return (
-//     <div className="bg-white shadow rounded-lg p-4">
-//       <h3 className="text-lg font-semibold mb-2">Quick Prescription</h3>
-//       <button
-//         className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800"
-//         onClick={() => navigate("/doctor/prescribe")}
-//       >
-//         Add New Prescription
-//       </button>
-//     </div>
-//   );
-// };
-
-// export default PrescriptionQuickForm;
 import React, { useState } from "react";
 import { createPrescription } from "../../services/doctorService";
 
