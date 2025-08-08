@@ -174,7 +174,7 @@ namespace SwasthyaChinha.API.Services
                      u.PhoneNumber.Contains(query)))
         .Select(u => new PatientSearchResultDTO
         {
-            Id = u.Id,
+            Id = u.Id.ToString(),
             Name = u.FullName,
             Email = u.Email,
             Phone = u.PhoneNumber
