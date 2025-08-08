@@ -49,5 +49,39 @@ namespace SwasthyaChinha.API.Controllers
             var expenses = await _patientService.GetExpensesAsync(userId);
             return Ok(expenses);
         }
+        // In PatientsController.cs
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchPatients(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return BadRequest("Search query is required");
+
+            var patients = await _context.Users
+                .Where(u => u.Role == "Patient" &&
+                           (u.FullName.Contains(query) ||
+                            u.Email.Contains(query) ||
+                            u.PhoneNumber.Contains(query)))
+                .Select(u => new
+                {
+                    id = u.Id,        // GUID
+                    name = u.FullName,
+                    email = u.Email,
+                    phone = u.PhoneNumber
+                })
+                .Take(10) // limit results
+                .ToListAsync();
+
+            return Ok(patients);
+        }
+[HttpGet("search")]
+public async Task<IActionResult> SearchPatients(string query)
+{
+    if (string.IsNullOrWhiteSpace(query))
+        return BadRequest("Search query is required");
+
+    var patients = await _patientService.SearchPatientsAsync(query);
+    return Ok(patients);
+}
+
     }
 }

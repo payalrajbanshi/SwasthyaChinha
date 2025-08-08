@@ -10,5 +10,7 @@ namespace SwasthyaChinha.API.Services.Interfaces
         //Task UpdateProfileAsync(string patientId, UpdatePatientDTO dto);
         Task<List<PatientPrescriptionDTO>> GetPrescriptionsAsync(string patientId);
         Task<List<PatientExpenseDTO>> GetExpensesAsync(string patientId);
+        Task<IEnumerable<PatientSearchResultDTO>> SearchPatientsAsync(string query);
+
     }
 }

@@ -790,10 +790,189 @@
 // };
 
 // export default PrescriptionPage;
+// import React, { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { createPrescription, getDoctorProfile } from "../../services/doctorService";
+// import Sidebar from "../../components/dashboard/Sidebar";
+
+// const PrescriptionPage = () => {
+//   const navigate = useNavigate();
+//   const [loading, setLoading] = useState(true);
+//   const [doctorInfo, setDoctorInfo] = useState({});
+//   const [formData, setFormData] = useState({
+//     patientId: "",
+//     hospitalId: "",
+//     medicines: [{ name: "", dosage: "" }]
+//   });
+//   const [qrCode, setQrCode] = useState(null);
+//   const [successMsg, setSuccessMsg] = useState("");
+
+//   // Fetch doctor profile
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       try {
+//         const profile = await getDoctorProfile();
+//         setDoctorInfo(profile);
+
+//         // Autofill hospital ID if available
+//         setFormData((prev) => ({
+//           ...prev,
+//           hospitalId: profile.hospitalId || ""
+//         }));
+//       } catch (err) {
+//         console.error("Error fetching profile", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProfile();
+//   }, []);
+
+//   const handleChange = (e) => {
+//     setFormData({ ...formData, [e.target.name]: e.target.value });
+//   };
+
+//   const handleMedicineChange = (index, field, value) => {
+//     const updated = [...formData.medicines];
+//     updated[index][field] = value;
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   const addMedicine = () => {
+//     setFormData({
+//       ...formData,
+//       medicines: [...formData.medicines, { name: "", dosage: "" }]
+//     });
+//   };
+
+//   const removeMedicine = (index) => {
+//     const updated = formData.medicines.filter((_, i) => i !== index);
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setSuccessMsg("");
+//     setQrCode(null);
+
+//     try {
+//       const res = await createPrescription(formData);
+//       if (res.qrCode) {
+//         setQrCode(res.qrCode);
+//         setSuccessMsg("✅ Prescription created successfully!");
+//       }
+//     } catch (error) {
+//       console.error("Error creating prescription:", error);
+//       alert("❌ Failed to create prescription");
+//     }
+//   };
+
+//   if (loading) return <div className="p-6">Loading prescription page...</div>;
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       <Sidebar />
+//       <div className="flex-1 p-6">
+//         {/* Prescription Header */}
+//         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
+//           <div className="text-center border-b pb-3">
+//             <h1 className="text-2xl font-bold">{doctorInfo.hospitalName}</h1>
+//             <p className="text-gray-600">{doctorInfo.hospitalAddress}</p>
+//           </div>
+
+//           <div className="flex justify-between mt-4 border-b pb-3">
+//             <div>
+//               <p className="font-semibold">{doctorInfo.fullName}</p>
+//               <p className="text-gray-600">{doctorInfo.specialty}</p>
+//             </div>
+//             {doctorInfo.signatureUrl && (
+//               <img
+//                 src={doctorInfo.signatureUrl}
+//                 alt="Doctor Signature"
+//                 className="h-12"
+//               />
+//             )}
+//           </div>
+
+//           {/* Prescription Form */}
+//           <form onSubmit={handleSubmit} className="mt-6">
+//             <div className="mb-4">
+//               <label className="block font-medium">Patient ID</label>
+//               <input
+//                 type="text"
+//                 name="patientId"
+//                 value={formData.patientId}
+//                 onChange={handleChange}
+//                 className="border rounded p-2 w-full"
+//                 required
+//               />
+//             </div>
+
+//             {/* Medicines */}
+//             <div className="mb-4">
+//               <label className="block font-medium">Medicines</label>
+//               {formData.medicines.map((med, index) => (
+//                 <div key={index} className="flex gap-2 mb-2">
+//                   <input
+//                     type="text"
+//                     placeholder="Medicine Name"
+//                     value={med.name}
+//                     onChange={(e) => handleMedicineChange(index, "name", e.target.value)}
+//                     className="border p-2 flex-1 rounded"
+//                     required
+//                   />
+//                   <input
+//                     type="text"
+//                     placeholder="Dosage"
+//                     value={med.dosage}
+//                     onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
+//                     className="border p-2 flex-1 rounded"
+//                     required
+//                   />
+//                   {index > 0 && (
+//                     <button
+//                       type="button"
+//                       onClick={() => removeMedicine(index)}
+//                       className="bg-red-500 text-white px-2 rounded"
+//                     >
+//                       ✕
+//                     </button>
+//                   )}
+//                 </div>
+//               ))}
+//               <button type="button" onClick={addMedicine} className="text-blue-500">
+//                 ➕ Add Medicine
+//               </button>
+//             </div>
+
+//             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded w-full">
+//               Send Prescription
+//             </button>
+//           </form>
+
+//           {/* QR Code */}
+//           {qrCode && (
+//             <div className="mt-6 text-center">
+//               <img
+//                 src={`data:image/png;base64,${qrCode}`}
+//                 alt="Prescription QR"
+//                 className="mx-auto w-40 h-40"
+//               />
+//               <p className="mt-2 text-green-600">{successMsg}</p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PrescriptionPage;
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPrescription, getDoctorProfile } from "../../services/doctorService";
 import Sidebar from "../../components/dashboard/Sidebar";
+import axios from "axios";
 
 const PrescriptionPage = () => {
   const navigate = useNavigate();
@@ -806,6 +985,11 @@ const PrescriptionPage = () => {
   });
   const [qrCode, setQrCode] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+
+  // Patient search states
+  const [patientQuery, setPatientQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   // Fetch doctor profile
   useEffect(() => {
@@ -828,8 +1012,29 @@ const PrescriptionPage = () => {
     fetchProfile();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // Handle patient search
+  const handleSearch = async (value) => {
+    setPatientQuery(value);
+    if (value.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const res = await axios.get(`/api/patients/search?query=${value}`);
+      setSearchResults(res.data);
+    } catch (err) {
+      console.error("Error searching patients", err);
+    }
+  };
+
+  const selectPatient = (patient) => {
+    setSelectedPatient(patient);
+    setPatientQuery(patient.name);
+    setFormData((prev) => ({
+      ...prev,
+      patientId: patient.id
+    }));
+    setSearchResults([]);
   };
 
   const handleMedicineChange = (index, field, value) => {
@@ -873,13 +1078,14 @@ const PrescriptionPage = () => {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       <div className="flex-1 p-6">
-        {/* Prescription Header */}
         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
+          {/* Hospital Info */}
           <div className="text-center border-b pb-3">
             <h1 className="text-2xl font-bold">{doctorInfo.hospitalName}</h1>
             <p className="text-gray-600">{doctorInfo.hospitalAddress}</p>
           </div>
 
+          {/* Doctor Info */}
           <div className="flex justify-between mt-4 border-b pb-3">
             <div>
               <p className="font-semibold">{doctorInfo.fullName}</p>
@@ -896,16 +1102,34 @@ const PrescriptionPage = () => {
 
           {/* Prescription Form */}
           <form onSubmit={handleSubmit} className="mt-6">
+            {/* Patient Search */}
             <div className="mb-4">
-              <label className="block font-medium">Patient ID</label>
+              <label className="block font-medium mb-1">Search Patient</label>
               <input
                 type="text"
-                name="patientId"
-                value={formData.patientId}
-                onChange={handleChange}
+                value={patientQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Type patient name, email, or phone..."
                 className="border rounded p-2 w-full"
-                required
               />
+              {searchResults.length > 0 && (
+                <ul className="border rounded bg-white mt-1 max-h-40 overflow-y-auto">
+                  {searchResults.map((p) => (
+                    <li
+                      key={p.id}
+                      onClick={() => selectPatient(p)}
+                      className="p-2 hover:bg-gray-200 cursor-pointer"
+                    >
+                      {p.name} — {p.email}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {selectedPatient && (
+                <p className="mt-2 text-green-600">
+                  ✅ Selected: {selectedPatient.name} ({selectedPatient.id})
+                </p>
+              )}
             </div>
 
             {/* Medicines */}

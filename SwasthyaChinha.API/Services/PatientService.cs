@@ -78,6 +78,7 @@ using Microsoft.EntityFrameworkCore;
 using SwasthyaChinha.API.Data;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using SwasthyaChinha.API.DTOs.Doctor;
+using SwasthyaChinha.API.DTOs.Patient;
 
 
 namespace SwasthyaChinha.API.Services
@@ -122,8 +123,8 @@ namespace SwasthyaChinha.API.Services
 
         public async Task<List<PatientPrescriptionDTO>> GetPrescriptionsAsync(String patientId)
         {
-           if (!Guid.TryParse(patientId, out Guid patientGuid))
-    throw new ArgumentException("Invalid patientId");
+            if (!Guid.TryParse(patientId, out Guid patientGuid))
+                throw new ArgumentException("Invalid patientId");
             return await _context.Prescriptions
                 .Where(p => p.PatientId == patientGuid)
                 .Include(p => p.Doctor)
@@ -142,19 +143,19 @@ namespace SwasthyaChinha.API.Services
                         Price = m.Cost
                     }).ToList()
                 }).ToListAsync();
-                    // Medicines = p.Items.Select(m => MedicineDTO
-                    //     {
-                    //         Name = m.MedicineName,
-                    //         Dosage = m.Dosage,
-                    //         Price=m.Cost
-                    //     }).ToList()
-                    // }).ToListAsync();
-                }
+            // Medicines = p.Items.Select(m => MedicineDTO
+            //     {
+            //         Name = m.MedicineName,
+            //         Dosage = m.Dosage,
+            //         Price=m.Cost
+            //     }).ToList()
+            // }).ToListAsync();
+        }
 
         public async Task<List<PatientExpenseDTO>> GetExpensesAsync(string patientId)
         {
-                if (!Guid.TryParse(patientId, out Guid patientGuid))
-        throw new ArgumentException("Invalid patientId");
+            if (!Guid.TryParse(patientId, out Guid patientGuid))
+                throw new ArgumentException("Invalid patientId");
 
             return await _context.Prescriptions
                 .Where(p => p.PatientId == patientGuid)
@@ -164,5 +165,23 @@ namespace SwasthyaChinha.API.Services
                     Total = p.TotalCost
                 }).ToListAsync();
         }
+        public async Task<IEnumerable<PatientSearchResultDTO>> SearchPatientsAsync(string query)
+{
+    return await _context.Users
+        .Where(u => u.Role == "Patient" &&
+                    (u.FullName.Contains(query) ||
+                     u.Email.Contains(query) ||
+                     u.PhoneNumber.Contains(query)))
+        .Select(u => new PatientSearchResultDTO
+        {
+            Id = u.Id,
+            Name = u.FullName,
+            Email = u.Email,
+            Phone = u.PhoneNumber
+        })
+        .Take(10)
+        .ToListAsync();
+}
+
     }
 }
