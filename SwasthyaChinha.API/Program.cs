@@ -407,13 +407,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+// In Program.cs or Startup.cs
+app.UseDeveloperExceptionPage();
 
 //app.UseHttpsRedirection();
+app.UseRouting();
 app.UseCors("ReactPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+// app.UseEndpoints(endpoints =>
+// {
+//     endpoints.MapControllers();
+// });
 app.MapControllers();
 
 app.Run();

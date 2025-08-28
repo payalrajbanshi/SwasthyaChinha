@@ -70,6 +70,38 @@ namespace SwasthyaChinha.API.Migrations
                     b.ToTable("Hospitals");
                 });
 
+            modelBuilder.Entity("SwasthyaChinha.API.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("SwasthyaChinha.API.Models.Patient", b =>
                 {
                     b.Property<Guid>("Id")
@@ -92,7 +124,12 @@ namespace SwasthyaChinha.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Patients");
                 });
@@ -243,6 +280,26 @@ namespace SwasthyaChinha.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("SwasthyaChinha.API.Models.Notification", b =>
+                {
+                    b.HasOne("SwasthyaChinha.API.Models.Patient", "Patient")
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("SwasthyaChinha.API.Models.Patient", b =>
+                {
+                    b.HasOne("SwasthyaChinha.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SwasthyaChinha.API.Models.Prescription", b =>

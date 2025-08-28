@@ -1,40 +1,96 @@
-// src/services/api.js
 // import axios from "axios";
 
-// const api = axios.create({
-//   baseURL: "https://localhost:5099/api", // Replace with your backend URL/port
+// // Create Axios instance
+// const API = axios.create({
+//   baseURL: "http://localhost:5099/api", // your backend URL
 //   headers: {
 //     "Content-Type": "application/json",
 //   },
 // });
 
-// export default api;
-// src/services/api.js
+// // Interceptor to attach token to every request
+// API.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem("token"); // save JWT after login
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
+
+// // API functions
+// export const getProfile = () => API.get("/patient/profile");
+// export const getPrescriptions = () => API.get("/Patient/prescriptions");
+// export const getLastPrescription = (patientId) => API.get(`/Patient/last-prescription/${patientId}`);
+// export const getLastVisit = (patientId) => API.get(`/Patient/last-visit/${patientId}`);
+
+// export default API;
 // import axios from "axios";
 
-// // Centralized axios instance
-// const api = axios.create({
-//   baseURL: "http://localhost:5099/api", 
+// // Create Axios instance
+// const API = axios.create({
+//   baseURL: "http://localhost:5099/api", // your backend URL
 //   headers: {
 //     "Content-Type": "application/json",
 //   },
 // });
 
-// export default api;
-// src/services/api.js
+// // Interceptor to attach token to every request
+// API.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem("token"); // save JWT after login
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
+
+// // ✅ Corrected API functions
+// export const getProfile = () => API.get("/patient/profile"); // lowercase 'patient'
+// export const getPrescriptions = () => API.get("/patient/prescriptions"); // lowercase
+// export const getLastVisit = (patientId) => API.get(`/patient/last-visit/${patientId}`); // lowercase
+// export const getLastPrescription = (patientId) => API.get(`/patient/last-prescription/${patientId}`); // lowercase
+
+// export default API;
+
+
+
+
+
+
+
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "http://localhost:5099/api", // your backend URL
+// Axios instance
+const API = axios.create({
+  baseURL: "http://localhost:5099/api", // backend URL
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-// Attach token for protected routes
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Attach JWT token to every request
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-export default api;
+// Export all API calls
+export const getProfile = () => API.get("/patient/profile");
+export const getPrescriptions = () => API.get("/patient/prescriptions");
+// Remove patientId from calls
+// export const getLastVisit = () => API.get("/patient/last-visit");
+// export const getLastPrescription = () => API.get("/patient/last-prescription");
+
+//export const getLastVisit = (patientId) => API.get(`/patient/last-visit/${patientId}`);
+//export const getLastPrescription = (patientId) => API.get(`/patient/last-prescription/${patientId}`);
+
+export default API;

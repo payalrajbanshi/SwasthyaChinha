@@ -1,4 +1,4 @@
-// src/services/doctorService.js
+//src/services/doctorService.js
 import api from "./api"; // Axios instance
 
 // Fetch doctor profile
@@ -13,7 +13,24 @@ export const getDoctorPatients = async () => {
   return res.data;
 };
 // Create a new prescription
-export const createPrescription = async (data) => {
-  const res = await api.post("/Doctor/prescribe", data);
+export const createPrescription = async (payload) => {
+  const res = await api.post("/Doctor/prescribe", payload);
   return res.data;
 };
+// src/services/doctorService.js
+// import api from "./api";
+
+// // Get doctor profile
+// export const getDoctorProfile = () => {
+//   return api.get("/doctor/profile");
+// };
+
+// // Get doctor stats
+// export const getDoctorStats = () => {
+//   return api.get("/doctor/stats");
+// };
+
+// // Get patients assigned to doctor
+// export const getDoctorPatients = () => {
+//   return api.get("/doctor/patients");
+// };

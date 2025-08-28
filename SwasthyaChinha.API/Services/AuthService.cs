@@ -662,6 +662,19 @@ namespace SwasthyaChinha.API.Services
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+                // ✅ Create Patient row
+    var patient = new Patient
+    {
+        FullName = user.FullName,
+        Gender = user.Gender,
+        PhoneNumber = user.PhoneNumber,
+        Address = "N/A",
+        UserId = user.Id
+    };
+
+    _context.Patients.Add(patient);
+    await _context.SaveChangesAsync();
+
 
             return new AuthResponseDto
             {
@@ -703,7 +716,7 @@ namespace SwasthyaChinha.API.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role.ToLower())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

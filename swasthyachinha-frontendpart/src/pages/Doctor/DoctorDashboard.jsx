@@ -211,91 +211,316 @@
 // };
 
 // export default DoctorDashboard;
-// src/pages/doctor/DoctorDashboard.jsx
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-// Dashboard Components
-import Sidebar from "../../components/dashboard/Sidebar";
-import DoctorProfileCard from "../../components/dashboard/DoctorProfileCard";
-import StatsCard from "../../components/dashboard/StatsCard";
-import ChartWidget from "../../components/dashboard/ChartWidget";
-import PatientsTable from "../../components/dashboard/PatientsTable";
-import PrescriptionQuickForm from "../../components/dashboard/PrescriptionQuickForm";
 
-// API Services
-import { getDoctorProfile, getDoctorPatients } from "../../services/doctorService";
+
+
+
+
+
+// // src/pages/doctor/DoctorDashboard.jsx
+// import React, { useEffect, useState } from "react";
+// import { Link } from "react-router-dom";
+// import { FaUserMd, FaClipboardList, FaHistory, FaQrcode, FaSignOutAlt } from "react-icons/fa";
+// import api from "../../services/api";
+
+// const DoctorDashboard = () => {
+//   const [doctor, setDoctor] = useState({});
+//   const [stats, setStats] = useState({ totalPatients: 0, prescriptionsGiven: 0 });
+
+//   useEffect(() => {
+//     // Fetch doctor profile
+//     api.get("/doctor/profile").then(res => setDoctor(res.data));
+
+//     // Fetch doctor stats
+//     api.get("/doctor/stats").then(res => setStats(res.data));
+//   }, []);
+
+//   return (
+//     <div className="flex h-screen bg-gray-100">
+//       {/* Sidebar */}
+//       <div className="w-64 bg-white shadow-lg flex flex-col items-center py-6">
+//         {/* Doctor Profile */}
+//         <img
+//           src={doctor.profilePicture || "/default-doctor.png"}
+//           alt="Doctor"
+//           className="w-20 h-20 rounded-full border-2 border-blue-500"
+//         />
+//         <h2 className="mt-3 text-lg font-semibold">{doctor.fullName}</h2>
+//         <p className="text-gray-500">{doctor.specialty}</p>
+
+//         {/* Navigation Links */}
+//         <nav className="mt-6 w-full">
+//           <Link
+//             to="/doctor-dashboard"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaUserMd /> Dashboard
+//           </Link>
+//           <Link
+//             to="/write-prescription"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaClipboardList /> Write Prescription
+//           </Link>
+//           <Link
+//             to="/patient-history"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaHistory /> Patient History
+//           </Link>
+//           <Link
+//             to="/scan-qr"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaQrcode /> Scan QR
+//           </Link>
+//           <Link
+//             to="/logout"
+//             className="flex items-center gap-3 px-6 py-3 text-red-500 hover:bg-red-50"
+//           >
+//             <FaSignOutAlt /> Logout
+//           </Link>
+//         </nav>
+//       </div>
+
+//       {/* Main Content */}
+//       <div className="flex-1 p-6">
+//         <h1 className="text-2xl font-bold mb-6">Doctor Dashboard</h1>
+
+//         {/* Stats Cards (Removed Total Cost) */}
+//         <div className="grid grid-cols-2 gap-6">
+//           <div className="bg-white p-6 rounded-lg shadow-md">
+//             <h3 className="text-lg font-semibold">Total Patients Today</h3>
+//             <p className="text-3xl font-bold">{stats.totalPatients}</p>
+//           </div>
+//           <div className="bg-white p-6 rounded-lg shadow-md">
+//             <h3 className="text-lg font-semibold">Prescriptions Given</h3>
+//             <p className="text-3xl font-bold">{stats.prescriptionsGiven}</p>
+//           </div>
+//         </div>
+
+//         {/* Additional Content */}
+//         <div className="mt-8">
+//           <h2 className="text-lg font-semibold mb-4">Recent Prescriptions</h2>
+//           {/* Add recent prescription table here */}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+
+
+
+// export default DoctorDashboard;
+//src/pages/doctor/DoctorDashboard.jsx
+// import React, { useEffect, useState } from "react";
+// import { Link } from "react-router-dom";
+// import { FaUserMd, FaClipboardList, FaHistory, FaUserCog, FaSignOutAlt } from "react-icons/fa"; 
+// import api from "../../services/api";
+
+// const DoctorDashboard = () => {
+//   const [doctor, setDoctor] = useState({});
+//   const [stats, setStats] = useState({ totalPatients: 0, prescriptionsGiven: 0 });
+//   const [patients, setPatients] = useState([]);
+
+//   useEffect(() => {
+//     // Fetch doctor profile
+//     api.get("/doctor/profile").then(res => setDoctor(res.data));
+
+//     // Fetch doctor stats
+//     api.get("/doctor/stats").then(res => setStats(res.data));
+
+//     // Fetch patients list
+//     api.get("/doctor/patients").then(res => setPatients(res.data));
+//   }, []);
+
+//   return (
+//     <div className="flex h-screen bg-gray-100">
+//       {/* Sidebar */}
+//       <div className="w-64 bg-white shadow-lg flex flex-col items-center py-6">
+//         {/* Doctor Profile */}
+//         <img
+//           src={doctor.profilePicture || "/default-doctor.png"}
+//           alt="Doctor"
+//           className="w-20 h-20 rounded-full border-2 border-blue-500"
+//         />
+//         <h2 className="mt-3 text-lg font-semibold">{doctor.fullName}</h2>
+//         <p className="text-gray-500">{doctor.specialty}</p>
+
+//         {/* Navigation Links */}
+//         <nav className="mt-6 w-full">
+//           <Link
+//             to="/doctor-dashboard"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaUserMd /> Dashboard
+//           </Link>
+//           <Link
+//             to="/write-prescription"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaClipboardList /> Write Prescription
+//           </Link>
+//           <Link
+//             to="/patient-history"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaHistory /> Patient History
+//           </Link>
+//           <Link
+//             to="/manage-profile"
+//             className="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-blue-50"
+//           >
+//             <FaUserCog /> Manage Profile
+//           </Link>
+//           <Link
+//             to="/logout"
+//             className="flex items-center gap-3 px-6 py-3 text-red-500 hover:bg-red-50"
+//           >
+//             <FaSignOutAlt /> Logout
+//           </Link>
+//         </nav>
+//       </div>
+
+//       {/* Main Content */}
+//       <div className="flex-1 p-6 overflow-y-auto">
+//         <h1 className="text-2xl font-bold mb-6">Doctor Dashboard</h1>
+
+//         {/* Stats Cards */}
+//         <div className="grid grid-cols-2 gap-6 mb-8">
+//           <div className="bg-white p-6 rounded-lg shadow-md">
+//             <h3 className="text-lg font-semibold">Total Patients Today</h3>
+//             <p className="text-3xl font-bold">{stats.totalPatients}</p>
+//           </div>
+//           <div className="bg-white p-6 rounded-lg shadow-md">
+//             <h3 className="text-lg font-semibold">Prescriptions Given</h3>
+//             <p className="text-3xl font-bold">{stats.prescriptionsGiven}</p>
+//           </div>
+//         </div>
+
+//         {/* My Patients Section */}
+//         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+//           <h2 className="text-lg font-semibold mb-4">My Patients</h2>
+//           <table className="w-full border-collapse border text-left">
+//             <thead>
+//               <tr className="bg-gray-50">
+//                 <th className="border px-4 py-2">Full Name</th>
+//                 <th className="border px-4 py-2">Patient ID</th>
+//                 <th className="border px-4 py-2">Last Visit Date</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {patients.length > 0 ? (
+//                 patients.map((p) => (
+//                   <tr key={p.id} className="hover:bg-gray-50">
+//                     <td className="border px-4 py-2">{p.name}</td>
+//                     <td className="border px-4 py-2">{p.id}</td>
+//                     <td className="border px-4 py-2">{p.lastVisitDate || "N/A"}</td>
+//                   </tr>
+//                 ))
+//               ) : (
+//                 <tr>
+//                   <td colSpan="3" className="text-center py-4 text-gray-500">
+//                     No patients found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+
+//         {/* Recent Prescriptions */}
+//         <div className="bg-white p-6 rounded-lg shadow-md">
+//           <h2 className="text-lg font-semibold mb-4">Recent Prescriptions</h2>
+//           {/* Prescription table goes here */}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DoctorDashboard;
+
+
+
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+import Sidebar from "../../components/dashboard/Sidebar"; // ✅ Import Sidebar
 
 const DoctorDashboard = () => {
-  const [doctor, setDoctor] = useState(null);
+  const [doctor, setDoctor] = useState({});
+  const [stats, setStats] = useState({ totalPatients: 0, prescriptionsGiven: 0 });
   const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const profileRes = await getDoctorProfile();
-        setDoctor(profileRes.data);
+    // Fetch doctor profile
+    api.get("/doctor/profile").then((res) => setDoctor(res.data));
 
-        const patientsRes = await getDoctorPatients();
-        setPatients(patientsRes.data);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Fetch doctor stats
+    api.get("/doctor/stats").then((res) => setStats(res.data));
 
-    fetchDashboardData();
+    // Fetch patients list
+    api.get("/doctor/patients").then((res) => setPatients(res.data));
   }, []);
 
-  if (loading) {
-    return <div className="p-6">Loading dashboard...</div>;
-  }
-
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="flex h-screen bg-gray-100">
+      {/* ✅ Sidebar */}
+      <Sidebar doctor={doctor} />
 
-      {/* Main Content Area */}
-      <div className="flex-1 p-6 bg-gray-100">
-        {/* Doctor Profile Card */}
-        <DoctorProfileCard doctor={doctor} />
+      {/* Main Content */}
+      <div className="flex-1 p-6 overflow-y-auto">
+        <h1 className="text-2xl font-bold mb-6">Doctor Dashboard</h1>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-4 my-6">
-          <StatsCard title="Total Patients" value={patients.length} />
-          <StatsCard title="Total Prescriptions" value="—" /> {/* Future API */}
-          <StatsCard title="Today's Patients" value="—" /> {/* Future API */}
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold">Total Patients Today</h3>
+            <p className="text-3xl font-bold">{stats.totalPatients}</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-semibold">Prescriptions Given</h3>
+            <p className="text-3xl font-bold">{stats.prescriptionsGiven}</p>
+          </div>
         </div>
 
-        {/* Main Dashboard Layout */}
-        <div className="grid grid-cols-3 gap-4">
-          {/* Left Section: Patients Table */}
-          <div className="col-span-2">
-            <PatientsTable patients={patients} />
-          </div>
+        {/* My Patients Section */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+          <h2 className="text-lg font-semibold mb-4">My Patients</h2>
+          <table className="w-full border-collapse border text-left">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border px-4 py-2">Full Name</th>
+                <th className="border px-4 py-2">Patient ID</th>
+                <th className="border px-4 py-2">Last Visit Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patients.length > 0 ? (
+                patients.map((p) => (
+                  <tr key={p.id} className="hover:bg-gray-50">
+                    <td className="border px-4 py-2">{p.name}</td>
+                    <td className="border px-4 py-2">{p.id}</td>
+                    <td className="border px-4 py-2">{p.lastVisitDate || "N/A"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-center py-4 text-gray-500">
+                    No patients found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-          {/* Right Section: Chart & Quick Prescription */}
-          <div>
-            <ChartWidget />
-
-            {/* Add New Prescription Button */}
-            <div className="mt-4">
-              <button
-                onClick={() => navigate("/doctor/prescribe")}
-                className="bg-green-600 text-white px-4 py-2 rounded mb-4 w-full"
-              >
-                ➕ Add New Prescription
-              </button>
-
-              {/* Quick Prescription Form */}
-              <PrescriptionQuickForm />
-            </div>
-          </div>
+        {/* Recent Prescriptions */}
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Recent Prescriptions</h2>
+          {/* Prescription table goes here */}
         </div>
       </div>
     </div>
@@ -303,3 +528,4 @@ const DoctorDashboard = () => {
 };
 
 export default DoctorDashboard;
+

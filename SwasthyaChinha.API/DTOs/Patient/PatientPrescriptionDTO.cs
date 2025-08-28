@@ -9,7 +9,8 @@ namespace SwasthyaChinha.API.DTOs.Patient
         public string HospitalName { get; set; }
         public DateTime DateIssued { get; set; }
         public List<MedicineDTO> Medicines { get; set; }
-        public decimal TotalCost { get; set; }
+        //public decimal TotalCost { get; set; }
+        public string QRCodeData => PrescriptionId;
     }
     //  public class MedicineDTO
     // {

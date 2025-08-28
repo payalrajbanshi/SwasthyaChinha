@@ -38,7 +38,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
-
+using SwasthyaChinha.API.DTOs.Patient;
 
 
 namespace SwasthyaChinha.API.Services
@@ -69,13 +69,13 @@ namespace SwasthyaChinha.API.Services
             //     var base64 = Convert.ToBase64String(ms.ToArray());
             //     prescription.QRCode = base64;
             // }
-             using (var qrGenerator = new QRCodeGenerator())
-    {
-        var qrData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
-        var pngQrCode = new PngByteQRCode(qrData);
-        byte[] qrCodeBytes = pngQrCode.GetGraphic(20);
-        prescription.QRCode = Convert.ToBase64String(qrCodeBytes);
-    }
+            using (var qrGenerator = new QRCodeGenerator())
+            {
+                var qrData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
+                var pngQrCode = new PngByteQRCode(qrData);
+                byte[] qrCodeBytes = pngQrCode.GetGraphic(20);
+                prescription.QRCode = Convert.ToBase64String(qrCodeBytes);
+            }
 
             await _context.SaveChangesAsync();
             return prescription;
@@ -132,6 +132,45 @@ namespace SwasthyaChinha.API.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        //  public async Task<LastPrescriptionDTO?> GetLastPrescriptionAsync(Guid patientId)
+        // {
+        //     var prescription = await _context.Prescriptions
+        //         .Include(p => p.Doctor)
+        //         .Include(p => p.Hospital)
+        //         .Where(p => p.PatientId == patientId)
+        //         .OrderByDescending(p => p.CreatedAt)
+        //         .FirstOrDefaultAsync();
+
+        //     if (prescription == null) return null;
+
+        //     return new LastPrescriptionDTO
+        //     {
+        //         PrescriptionId = prescription.Id,
+        //         DoctorName = prescription.Doctor?.FullName,
+        //         HospitalName = prescription.Hospital?.Name,
+        //         DateIssued = prescription.CreatedAt,
+        //         Status = prescription.IsDispensed ? "Dispensed" :"Pending"
+        //     };
+        // }
+
+        // public async Task<LastVisitDTO> GetLastVisitAsync(Guid patientId)
+        // {
+        //     var visit = await _context.Prescriptions
+        //         .Include(p => p.Doctor)
+        //         .Include(p => p.Hospital)
+        //         .Where(p => p.PatientId == patientId)
+        //         .OrderByDescending(p => p.CreatedAt)
+        //         .FirstOrDefaultAsync();
+
+        //     if (visit == null) return null;
+
+        //     return new LastVisitDTO
+        //     {
+        //         DoctorName = visit.Doctor?.FullName,
+        //         HospitalName = visit.Hospital?.Name,
+        //         VisitDate = visit.CreatedAt
+        //     };
+        // }
 
 
     }

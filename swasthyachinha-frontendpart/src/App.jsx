@@ -261,48 +261,385 @@
 //     </Routes>
 //   );
 // }
+// import { Routes, Route } from "react-router-dom";
+// import Layout from "./components/Layout";
+// import Home from "./pages/Home";
+// import Login from "./pages/Auth/Login";
+// import Register from "./pages/Auth/Register";
+
+// import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
+// import PatientDashboard from "./pages/Patient/PatientDashboard";
+// import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard";
+// import HospitalDashboard from "./pages/HospitalAdmin/Dashboard";
+// import RegisterDoctor from "./pages/HospitalAdmin/RegisterDoctor";
+// import DoctorList from "./components/HospitalAdmin/DoctorList";
+// import PrescriptionPage from "./pages/doctor/PrescriptionPage";
+// import PatientsPage from "./pages/doctor/PatientsPage";   
+// import ProfilePage from "./pages/doctor/ProfilePage";
+
+
+// import ProtectedRoute from "./components/ProtectedRoute";
+
+// export default function App() {
+//   return (
+//     <Routes>
+//       {/* 🌐 Public Routes (no sidebar) */}
+//       <Route path="/" element={<Home />} />
+//       <Route path="/login" element={<Login />} />
+//       <Route path="/register/:role" element={<Register />} />
+
+//       {/* 🏥 HospitalAdmin Routes (with sidebar layout) */}
+//       <Route
+//         path="/hospital"
+//         element={
+//           <ProtectedRoute allowedRoles={["hospitaladmin"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<HospitalDashboard />} />
+//         <Route path="register-doctor" element={<RegisterDoctor />} />
+//         <Route path="doctor-list" element={<DoctorList />} />
+//         {/* Add more hospitaladmin child routes if needed */}
+//       </Route>
+
+//       {/* 🩺 Doctor Dashboard */}
+//       <Route
+//         path="/doctor/dashboard"
+//         element={
+//           <ProtectedRoute allowedRoles={["doctor"]}>
+//             <DoctorDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+//       {/* 👤 Patient Dashboard */}
+//       <Route
+//         path="/patient/dashboard"
+//         element={
+//           <ProtectedRoute allowedRoles={["patient"]}>
+//             <PatientDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+//       {/* 💊 Pharmacist Dashboard */}
+//       <Route
+//         path="/pharmacist/dashboard"
+//         element={
+//           <ProtectedRoute allowedRoles={["pharmacist"]}>
+//             <PharmacistDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+//       <Route path="/doctor/prescribe" element={<PrescriptionPage />} />
+
+//       {/* 🛑 Fallback to Home */}
+//       <Route path="*" element={<Home />} />
+//     </Routes>
+//   );
+// }
+
+// import { Routes, Route } from "react-router-dom";
+// import Layout from "./components/Layout";
+// import Home from "./pages/Home";
+// import Login from "./pages/Auth/Login";
+// import Register from "./pages/Auth/Register";
+
+// import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
+// import PatientDashboard from "./pages/Patient/PatientDashboard";
+// import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard";
+// import HospitalDashboard from "./pages/HospitalAdmin/Dashboard";
+// import RegisterDoctor from "./pages/HospitalAdmin/RegisterDoctor";
+// import DoctorList from "./components/HospitalAdmin/DoctorList";
+
+// import PrescriptionPage from "./pages/doctor/PrescriptionPage";
+// import PatientsPage from "./pages/doctor/PatientsPage";   // 👈 you’ll create this
+// import ProfilePage from "./pages/doctor/ProfilePage";     // 👈 you’ll create this
+
+// import ProtectedRoute from "./components/ProtectedRoute";
+
+// export default function App() {
+//   return (
+//     <Routes>
+//       {/* 🌐 Public Routes (no sidebar) */}
+//       <Route path="/" element={<Home />} />
+//       <Route path="/login" element={<Login />} />
+//       <Route path="/register/:role" element={<Register />} />
+
+//       {/* 🏥 HospitalAdmin Routes (with sidebar layout) */}
+//       <Route
+//         path="/hospital"
+//         element={
+//           <ProtectedRoute allowedRoles={["hospitaladmin"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<HospitalDashboard />} />
+//         <Route path="register-doctor" element={<RegisterDoctor />} />
+//         <Route path="doctor-list" element={<DoctorList />} />
+//       </Route>
+
+//       {/* 🩺 Doctor Routes (with sidebar layout) */}
+//       <Route
+//         path="/doctor"
+//         element={
+//           <ProtectedRoute allowedRoles={["doctor"]}>
+//             <Layout />  {/* 👈 Sidebar will render inside Layout */}
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<DoctorDashboard />} />
+//         <Route path="prescribe" element={<PrescriptionPage />} />
+//         <Route path="patients" element={<PatientsPage />} />
+//         <Route path="profile" element={<ProfilePage />} />
+//       </Route>
+
+//       {/* 👤 Patient Dashboard */}
+//       <Route
+//         path="/patient/dashboard"
+//         element={
+//           <ProtectedRoute allowedRoles={["patient"]}>
+//             <PatientDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+//       {/* 💊 Pharmacist Dashboard */}
+//       <Route
+//         path="/pharmacist/dashboard"
+//         element={
+//           <ProtectedRoute allowedRoles={["pharmacist"]}>
+//             <PharmacistDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+//       {/* 🛑 Fallback */}
+//       <Route path="*" element={<Home />} />
+//     </Routes>
+//   );
+// }
+
+
+// import { Routes, Route } from "react-router-dom";
+// import Layout from "./components/Layout";
+// import Home from "./pages/Home";
+// import Login from "./pages/Auth/Login";
+// import Register from "./pages/Auth/Register";
+
+// import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
+// import PatientDashboard from "./pages/Patient/PatientDashboard";
+// import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard";
+// import HospitalDashboard from "./pages/HospitalAdmin/Dashboard";
+// import RegisterDoctor from "./pages/HospitalAdmin/RegisterDoctor";
+// import DoctorList from "./components/HospitalAdmin/DoctorList";
+// import PrescriptionPage from "./pages/doctor/PrescriptionPage";
+// import PatientsPage from "./pages/doctor/PatientsPage";
+// import ProfilePage from "./pages/doctor/ProfilePage";
+
+// import ProtectedRoute from "./components/ProtectedRoute";
+
+// export default function App() {
+//   return (
+//     <Routes>
+//       {/* 🌐 Public Routes (no sidebar) */}
+//       <Route path="/" element={<Home />} />
+//       <Route path="/login" element={<Login />} />
+//       <Route path="/register/:role" element={<Register />} />
+
+//       {/* 🏥 HospitalAdmin Routes (with sidebar layout) */}
+//       <Route
+//         path="/hospital"
+//         element={
+//           <ProtectedRoute allowedRoles={["hospitaladmin"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<HospitalDashboard />} />
+//         <Route path="register-doctor" element={<RegisterDoctor />} />
+//         <Route path="doctor-list" element={<DoctorList />} />
+//       </Route>
+
+//       {/* 🩺 Doctor Routes (with sidebar layout) */}
+//       <Route
+//         path="/doctor"
+//         element={
+//           <ProtectedRoute allowedRoles={["doctor"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<DoctorDashboard />} />
+//         <Route path="prescribe" element={<PrescriptionPage />} />
+//         <Route path="patients" element={<PatientsPage />} />
+//         <Route path="profile" element={<ProfilePage />} />
+//       </Route>
+
+//       {/* 👤 Patient Dashboard */}
+//       <Route
+//         path="/patient/dashboard"
+//         element={
+//           <ProtectedRoute allowedRoles={["patient"]}>
+//             <PatientDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+//       {/* 💊 Pharmacist Dashboard */}
+//       <Route
+//         path="/pharmacist/dashboard"
+//         element={
+//           <ProtectedRoute allowedRoles={["pharmacist"]}>
+//             <PharmacistDashboard />
+//           </ProtectedRoute>
+//         }
+//       />
+
+//       {/* 🛑 Fallback to Home */}
+//       <Route path="*" element={<Home />} />
+//     </Routes>
+//   );
+// }
+// import { Routes, Route } from "react-router-dom";
+// import Layout from "./components/Layout";
+// import Home from "./pages/Home";
+// import Login from "./pages/Auth/Login";
+// import Register from "./pages/Auth/Register";
+
+// import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
+// import PatientDashboard from "./pages/Patient/PatientDashboard";
+// import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard";
+// import HospitalDashboard from "./pages/HospitalAdmin/Dashboard";
+// import RegisterDoctor from "./pages/HospitalAdmin/RegisterDoctor";
+// import DoctorList from "./components/HospitalAdmin/DoctorList";
+// import PrescriptionPage from "./pages/doctor/PrescriptionPage";
+// import PatientsPage from "./pages/doctor/PatientsPage";
+// import ProfilePage from "./pages/doctor/ProfilePage";
+
+// import ProtectedRoute from "./components/ProtectedRoute";
+
+// export default function App() {
+//   return (
+//     <Routes>
+//       {/* 🌐 Public Routes */}
+//       <Route path="/" element={<Home />} />
+//       <Route path="/login" element={<Login />} />
+//       <Route path="/register/:role" element={<Register />} />
+
+//       {/* 🏥 HospitalAdmin Routes */}
+//       <Route
+//         path="/hospital"
+//         element={
+//           <ProtectedRoute allowedRoles={["hospitaladmin"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<HospitalDashboard />} />
+//         <Route path="register-doctor" element={<RegisterDoctor />} />
+//         <Route path="doctor-list" element={<DoctorList />} />
+//       </Route>
+
+//       {/* 🩺 Doctor Routes */}
+//       <Route
+//         path="/doctor"
+//         element={
+//           <ProtectedRoute allowedRoles={["doctor"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<DoctorDashboard />} />
+//         <Route path="prescribe" element={<PrescriptionPage />} />
+//         <Route path="patients" element={<PatientsPage />} />
+//         <Route path="profile" element={<ProfilePage />} />
+//       </Route>
+
+//       {/* 👤 Patient Routes */}
+//       <Route
+//         path="/patient"
+//         element={
+//           <ProtectedRoute allowedRoles={["patient"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<PatientDashboard />} />
+//       </Route>
+
+//       {/* 💊 Pharmacist Routes */}
+//       <Route
+//         path="/pharmacist"
+//         element={
+//           <ProtectedRoute allowedRoles={["pharmacist"]}>
+//             <Layout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route path="dashboard" element={<PharmacistDashboard />} />
+//       </Route>
+
+//       {/* 🛑 Fallback */}
+//       <Route path="*" element={<Home />} />
+//     </Routes>
+//   );
+// }
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 
-import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
-import PatientDashboard from "./pages/Patient/PatientDashboard";
-import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard";
+import DoctorDashboard from "./pages/doctor/DoctorDashboard";
+import PatientDashboard from "./pages/Patient/Dashboard";
+import PharmacistDashboard from "./pages/pharmacist/PharmacistDashboard";
 import HospitalDashboard from "./pages/HospitalAdmin/Dashboard";
 import RegisterDoctor from "./pages/HospitalAdmin/RegisterDoctor";
 import DoctorList from "./components/HospitalAdmin/DoctorList";
 import PrescriptionPage from "./pages/doctor/PrescriptionPage";
-
-
+import PatientsPage from "./pages/doctor/PatientsPage";
+import ProfilePage from "./pages/doctor/ProfilePage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
     <Routes>
-      {/* 🌐 Public Routes (no sidebar) */}
+      {/* 🌐 Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register/:role" element={<Register />} />
 
-      {/* 🏥 HospitalAdmin Routes (with sidebar layout) */}
+      {/* 🏥 Hospital Admin */}
       <Route
-        path="/hospital"
+        path="/hospital/dashboard"
         element={
           <ProtectedRoute allowedRoles={["hospitaladmin"]}>
-            <Layout />
+            <HospitalDashboard />
           </ProtectedRoute>
         }
-      >
-        <Route path="dashboard" element={<HospitalDashboard />} />
-        <Route path="register-doctor" element={<RegisterDoctor />} />
-        <Route path="doctor-list" element={<DoctorList />} />
-        {/* Add more hospitaladmin child routes if needed */}
-      </Route>
+      />
+      <Route
+        path="/hospital/register-doctor"
+        element={
+          <ProtectedRoute allowedRoles={["hospitaladmin"]}>
+            <RegisterDoctor />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hospital/doctor-list"
+        element={
+          <ProtectedRoute allowedRoles={["hospitaladmin"]}>
+            <DoctorList />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* 🩺 Doctor Dashboard */}
+      {/* 🩺 Doctor */}
       <Route
         path="/doctor/dashboard"
         element={
@@ -311,8 +648,32 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/doctor/prescribe"
+        element={
+          <ProtectedRoute allowedRoles={["doctor"]}>
+            <PrescriptionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/doctor/patients"
+        element={
+          <ProtectedRoute allowedRoles={["doctor"]}>
+            <PatientsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/doctor/profile"
+        element={
+          <ProtectedRoute allowedRoles={["doctor"]}>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* 👤 Patient Dashboard */}
+      {/* 👤 Patient */}
       <Route
         path="/patient/dashboard"
         element={
@@ -322,7 +683,7 @@ export default function App() {
         }
       />
 
-      {/* 💊 Pharmacist Dashboard */}
+      {/* 💊 Pharmacist */}
       <Route
         path="/pharmacist/dashboard"
         element={
@@ -331,9 +692,8 @@ export default function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/doctor/prescribe" element={<PrescriptionPage />} />
 
-      {/* 🛑 Fallback to Home */}
+      {/* 🛑 Fallback */}
       <Route path="*" element={<Home />} />
     </Routes>
   );

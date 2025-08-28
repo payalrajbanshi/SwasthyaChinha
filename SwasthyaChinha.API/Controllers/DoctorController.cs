@@ -70,7 +70,7 @@ using System.Security.Claims;
 
 namespace SwasthyaChinha.API.Controllers
 {
-    [Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "doctor")]
     [ApiController]
     [Route("api/[controller]")]
     public class DoctorController : ControllerBase
@@ -100,8 +100,8 @@ namespace SwasthyaChinha.API.Controllers
             return Ok(new
             {
                 message = "Prescription created",
-                qrCode=qrCodeBase64
-             });
+                qrCode = qrCodeBase64
+            });
         }
 
         [HttpGet("patients")]
@@ -111,5 +111,26 @@ namespace SwasthyaChinha.API.Controllers
             var patients = await _doctorService.GetPatientsAsync(doctorId);
             return Ok(patients);
         }
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetStats()
+        {
+            var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var stats = await _doctorService.GetStatsAsync(doctorId);
+
+            return Ok(stats);
+        }
+
+[Authorize(Roles = "doctor")]
+[HttpGet("search-patients")]
+public async Task<IActionResult> SearchPatients([FromQuery] string query)
+{
+    if (string.IsNullOrWhiteSpace(query))
+        return BadRequest("Query is required");
+
+    var results = await _doctorService.SearchPatientsAsync(query);
+    return Ok(results);
+}
+
+
     }
 }

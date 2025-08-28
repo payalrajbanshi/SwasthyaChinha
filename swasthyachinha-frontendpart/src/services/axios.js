@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://localhost:5099', // Change to your ASP.NET backend base URL
+  baseURL: 'http://localhost:5099', // Change to your ASP.NET backend base URL
   headers: {
     'Content-Type': 'application/json',
   },

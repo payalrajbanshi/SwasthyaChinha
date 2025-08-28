@@ -314,8 +314,9 @@ using SwasthyaChinha.API.Services.Interfaces;
 using SwasthyaChinha.API.Data;
 using SwasthyaChinha.API.Models;  // Important for Prescription, PrescriptionItem
 using Microsoft.EntityFrameworkCore;
+using SwasthyaChinha.API.DTOs.Patient;
 
-namespace SwasthyaChinha.API.Services
+namespace SwasthyaChinha.API.Services 
 {
     public class DoctorService : IDoctorService
     {
@@ -325,13 +326,37 @@ namespace SwasthyaChinha.API.Services
         {
             _context = context;
         }
+        public async Task<DoctorStatsDTO> GetStatsAsync(string doctorId)
+        {
+            // Convert doctorId string → Guid
+            if (!Guid.TryParse(doctorId, out Guid doctorGuid))
+                throw new Exception("Invalid doctor ID");
+
+            var today = DateTime.UtcNow.Date;
+
+            var patientsToday = await _context.Prescriptions
+                .Where(p => p.DoctorId == doctorGuid && p.CreatedAt.Date == today)  // ✅ Use CreatedAt instead of DateIssued
+                .Select(p => p.PatientId)
+                .Distinct()
+                .CountAsync();
+
+            var prescriptionsToday = await _context.Prescriptions
+                .Where(p => p.DoctorId == doctorGuid && p.CreatedAt.Date == today)  // ✅
+                .CountAsync();
+
+            return new DoctorStatsDTO
+            {
+                PatientsToday = patientsToday,
+                PrescriptionsGiven = prescriptionsToday
+            };
+        }
 
         public async Task<DoctorProfileDTO> GetProfileAsync(string doctorId)
         {
             // DoctorId is string, so query directly
             var doctor = await _context.Users
                 .Include(u => u.Hospital)  // Hospital has Guid Id - no problem here
-                .FirstOrDefaultAsync(u => u.Id.ToString() == doctorId & u.Role =="Doctor");
+                .FirstOrDefaultAsync(u => u.Id.ToString() == doctorId & u.Role == "Doctor");
 
             if (doctor == null)
                 throw new Exception("Doctor not found");
@@ -346,7 +371,7 @@ namespace SwasthyaChinha.API.Services
                 HospitalAddress = doctor.Hospital?.Address,
                 ProfileImageUrl = doctor.ProfileImageUrl,
                 SignatureUrl = doctor.SignatureUrl,
-                 HospitalId = doctor.HospitalId ?? Guid.Empty,
+                HospitalId = doctor.HospitalId ?? Guid.Empty,
             };
         }
 
@@ -375,24 +400,24 @@ namespace SwasthyaChinha.API.Services
 
             _context.Prescriptions.Add(prescription);
             await _context.SaveChangesAsync();
-                // ✅ Generate QR code with prescription ID
-    var qrService = new QRService();
-    var qrCodeBase64 = qrService.GenerateQRCode($"PRESC-{prescription.Id}");
+            // ✅ Generate QR code with prescription ID
+            var qrService = new QRService();
+            var qrCodeBase64 = qrService.GenerateQRCode($"PRESC-{prescription.Id}");
 
-    // Save QR in DB if needed
-    prescription.QRCode = qrCodeBase64;
-    await _context.SaveChangesAsync();
+            // Save QR in DB if needed
+            prescription.QRCode = qrCodeBase64;
+            await _context.SaveChangesAsync();
 
-    // Return QR for frontend
-    return qrCodeBase64;
+            // Return QR for frontend
+            return qrCodeBase64;
         }
 
         public async Task<List<DoctorPatientDTO>> GetPatientsAsync(string doctorId)
         {
-                if (!Guid.TryParse(doctorId, out Guid doctorGuid))
-    {
-        throw new ArgumentException("Invalid doctorId");
-    }
+            if (!Guid.TryParse(doctorId, out Guid doctorGuid))
+            {
+                throw new ArgumentException("Invalid doctorId");
+            }
             return await _context.Prescriptions
                 .Where(p => p.DoctorId == doctorGuid)  // DoctorId is string
                 .Include(p => p.Patient)
@@ -405,5 +430,27 @@ namespace SwasthyaChinha.API.Services
                 .Distinct()
                 .ToListAsync();
         }
+        
+
+public async Task<IEnumerable<PatientSearchResultDTO>> SearchPatientsAsync(string query)
+{
+    query = query.Trim().ToLower();
+
+    var patients = await _context.Patients
+        .Where(p => p.FullName.ToLower().Contains(query)
+                 || p.PhoneNumber.Contains(query))
+        .Select(p => new PatientSearchResultDTO
+        {
+            Id = p.Id.ToString(),       // convert GUID to string
+            Name = p.FullName,
+            Email = "",
+            Phone = p.PhoneNumber
+        })
+        .ToListAsync();
+
+    return patients;
+}
+
+
     }
 }
