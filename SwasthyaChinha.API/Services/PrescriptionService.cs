@@ -109,9 +109,9 @@ namespace SwasthyaChinha.API.Services
             return new PrescriptionQRDTO
             {
                 PrescriptionId = prescription.Id.ToString(),
-                PatientName = prescription.Patient?.FullName, // Or actual name if you have relation
-                DoctorName = prescription.Doctor?.FullName,
-                HospitalName = prescription.Hospital?.Name,
+                PatientName = prescription.Patient?.FullName ?? "Unknown", // Or actual name if you have relation
+                DoctorName = prescription.Doctor?.FullName ?? "Unknown",
+                HospitalName = prescription.Hospital?.Name ?? "Unknown",
                 Medicines = prescription.Items.Select(m => new MedicineDTO
                 {
                     Name = m.MedicineName,
@@ -124,11 +124,13 @@ namespace SwasthyaChinha.API.Services
         }
         public async Task<bool> MarkAsDispensedAsync(string prescriptionId)
         {
-            var prescription = await _context.Prescriptions.FindAsync(int.Parse(prescriptionId));
+            if (!int.TryParse(prescriptionId, out int id)) return false;
+            var prescription = await _context.Prescriptions.FindAsync(id);
             if (prescription == null)
                 return false;
 
             prescription.IsDispensed = true;
+            _context.Prescriptions.Update(prescription);
             await _context.SaveChangesAsync();
             return true;
         }

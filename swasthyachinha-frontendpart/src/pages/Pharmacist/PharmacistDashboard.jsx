@@ -1,52 +1,262 @@
-import React from "react";
+// import { useState } from "react";
+// import { getPrescriptionByQR, dispenseMedicine } from "../../services/pharmacistService";
+
+// export default function PharmacistDashboard() {
+//   const [qr, setQr] = useState("");
+//   const [prescription, setPrescription] = useState(null);
+//   const [error, setError] = useState("");
+//   const token = localStorage.getItem("token");
+
+//   const handleSearch = async () => {
+//     try {
+//       const data = await getPrescriptionByQR(qr, token);
+//       setPrescription(data);
+//       setError("");
+//     } catch (err) {
+//       setError("Prescription not found");
+//       setPrescription(null);
+//     }
+//   };
+
+//   const handleDispense = async () => {
+//     try {
+//       await dispenseMedicine(prescription.prescriptionId, token);
+//       setPrescription({ ...prescription, isDispensed: true });
+//     } catch {
+//       setError("Failed to dispense");
+//     }
+//   };
+
+//   return (
+//     <div className="p-4">
+//       <h1 className="text-xl font-bold mb-4">Pharmacist Dashboard</h1>
+
+//       <div className="flex gap-2 mb-4">
+//         <input
+//           type="text"
+//           placeholder="Enter QR code"
+//           value={qr}
+//           onChange={(e) => setQr(e.target.value)}
+//           className="border p-2 rounded"
+//         />
+//         <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">
+//           Search
+//         </button>
+//       </div>
+
+//       {error && <p className="text-red-500">{error}</p>}
+
+//       {prescription && (
+//         <div className="border p-4 rounded shadow">
+//           <h2 className="font-bold">Prescription Details</h2>
+//           <p>Patient: {prescription.patientName}</p>
+//           <p>Doctor: {prescription.doctorName}</p>
+//           <p>Hospital: {prescription.hospitalName}</p>
+
+//           <h3 className="mt-2 font-semibold">Medicines</h3>
+//           <ul className="list-disc pl-5">
+//             {prescription.medicines.map((m, i) => (
+//               <li key={i}>
+//                 {m.name} - {m.dosage} - Rs.{m.price}
+//               </li>
+//             ))}
+//           </ul>
+
+//           <p className="mt-2">Status: {prescription.isDispensed ? "Dispensed" : "Pending"}</p>
+
+//           {!prescription.isDispensed && (
+//             <button
+//               onClick={handleDispense}
+//               className="mt-3 bg-green-600 text-white px-4 py-2 rounded"
+//             >
+//               Mark as Dispensed
+//             </button>
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+// import { useState } from "react";
+// import { getPrescriptionByQR, dispenseMedicine } from "../../services/pharmacistService";
+// import QRScanner from "../../components/pharmacist/QRScanner";
+
+// export default function PharmacistDashboard() {
+//   const [qr, setQr] = useState("");
+//   const [prescription, setPrescription] = useState(null);
+//   const [error, setError] = useState("");
+//   const token = localStorage.getItem("token");
+
+//   const fetchPrescription = async (qrCode) => {
+//     try {
+//       const data = await getPrescriptionByQR(qrCode, token);
+//       setPrescription(data);
+//       setError("");
+//     } catch (err) {
+//       setError("Prescription not found");
+//       setPrescription(null);
+//     }
+//   };
+
+//   const handleDispense = async () => {
+//     try {
+//       await dispenseMedicine(prescription.prescriptionId, token);
+//       setPrescription({ ...prescription, isDispensed: true });
+//     } catch {
+//       setError("Failed to dispense");
+//     }
+//   };
+
+//   return (
+//     <div className="p-4">
+//       <h1 className="text-xl font-bold mb-4">Pharmacist Dashboard</h1>
+
+//       {/* QR Scanner */}
+//       <QRScanner onScan={(qrCode) => {
+//         setQr(qrCode);
+//         fetchPrescription(qrCode);
+//       }} />
+
+//       <div className="flex gap-2 my-4">
+//         <input
+//           type="text"
+//           placeholder="Enter QR code manually"
+//           value={qr}
+//           onChange={(e) => setQr(e.target.value)}
+//           className="border p-2 rounded flex-1"
+//         />
+//         <button
+//           onClick={() => fetchPrescription(qr)}
+//           className="bg-blue-500 text-white px-4 py-2 rounded"
+//         >
+//           Search
+//         </button>
+//       </div>
+
+//       {error && <p className="text-red-500">{error}</p>}
+
+//       {prescription && (
+//         <div className="border p-4 rounded shadow">
+//           <h2 className="font-bold">Prescription Details</h2>
+//           <p>Patient: {prescription.patientName}</p>
+//           <p>Doctor: {prescription.doctorName}</p>
+//           <p>Hospital: {prescription.hospitalName}</p>
+
+//           <h3 className="mt-2 font-semibold">Medicines</h3>
+//           <ul className="list-disc pl-5">
+//             {prescription.medicines.map((m, i) => (
+//               <li key={i}>
+//                 {m.name} - {m.dosage} - Rs.{m.price}
+//               </li>
+//             ))}
+//           </ul>
+
+//           <p className="mt-2">Status: {prescription.isDispensed ? "✅ Dispensed" : "⏳ Pending"}</p>
+
+//           {!prescription.isDispensed && (
+//             <button
+//               onClick={handleDispense}
+//               className="mt-3 bg-green-600 text-white px-4 py-2 rounded"
+//             >
+//               Mark as Dispensed
+//             </button>
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
+import { useState } from "react";
+import { getPrescriptionByQR, dispenseMedicine } from "../../services/pharmacistService";
+import QRScanner from "../../components/pharmacist/QRScanner";
 
 export default function PharmacistDashboard() {
+  const [qr, setQr] = useState("");
+  const [prescription, setPrescription] = useState(null);
+  const [error, setError] = useState("");
+  const token = localStorage.getItem("token");
+
+  const fetchPrescription = async (qrCode) => {
+    try {
+      const data = await getPrescriptionByQR(qrCode, token);
+      setPrescription(data);
+      setError("");
+    } catch (err) {
+      setError("Prescription not found");
+      setPrescription(null);
+    }
+  };
+
+  const handleDispense = async () => {
+    try {
+      await dispenseMedicine(prescription.prescriptionId, token);
+      setPrescription({ ...prescription, isDispensed: true });
+    } catch {
+      setError("Failed to dispense");
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">
-        👋 Welcome, Pharmacist!
-      </h1>
+    <div className="p-4">
+      <h1 className="text-xl font-bold mb-4">Pharmacist Dashboard</h1>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-lg font-semibold text-green-800 mb-2">✅ Prescriptions Verified Today</h2>
-          <p className="text-3xl font-bold text-gray-700">14</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-lg font-semibold text-green-800 mb-2">📦 Medicines Dispensed</h2>
-          <p className="text-3xl font-bold text-gray-700">27</p>
-        </div>
+      {/* QR Scanner */}
+      <QRScanner
+        onScan={(qrCode) => {
+          setQr(qrCode);
+          fetchPrescription(qrCode);
+        }}
+      />
+
+      {/* Manual QR input */}
+      <div className="flex gap-2 my-4">
+        <input
+          type="text"
+          placeholder="Enter QR code manually"
+          value={qr}
+          onChange={(e) => setQr(e.target.value)}
+          className="border p-2 rounded flex-1"
+        />
+        <button
+          onClick={() => fetchPrescription(qr)}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Search
+        </button>
       </div>
 
-      {/* Quick Links */}
-      <div className="bg-white p-6 rounded shadow mb-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            🔍 Scan QR
-          </button>
-          <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            📄 Verify Prescription
-          </button>
-          <button className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
-            💊 Dispense Medicine
-          </button>
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-            ☎️ Contact Support
-          </button>
-        </div>
-      </div>
+      {/* Error */}
+      {error && <p className="text-red-500">{error}</p>}
 
-      {/* Recent Prescriptions Section */}
-      <div className="bg-white p-6 rounded shadow">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">🕒 Recent Prescriptions</h3>
-        <ul className="space-y-2 text-sm text-gray-600">
-          <li>John Doe - Paracetamol 500mg - Verified ✔️</li>
-          <li>Jane Smith - Amoxicillin 250mg - Dispensed 📦</li>
-          <li>Raj Sharma - Ibuprofen 400mg - Pending ❌</li>
-        </ul>
-      </div>
-    </main>
+      {/* Prescription details */}
+      {prescription && (
+        <div className="border p-4 rounded shadow-md bg-white">
+          <h2 className="font-bold text-lg mb-2">Prescription Details</h2>
+          <p><strong>Patient:</strong> {prescription.patientName}</p>
+          <p><strong>Doctor:</strong> {prescription.doctorName}</p>
+          <p><strong>Hospital:</strong> {prescription.hospitalName}</p>
+
+          <h3 className="mt-2 font-semibold">Medicines</h3>
+          <ul className="list-disc pl-5">
+            {prescription.medicines.map((m, i) => (
+              <li key={i}>
+                {m.name} - {m.dosage} - Rs.{m.price}
+              </li>
+            ))}
+          </ul>
+
+          <p className="mt-2"><strong>Status:</strong> {prescription.isDispensed ? "✅ Dispensed" : "⏳ Pending"}</p>
+
+          {!prescription.isDispensed && (
+            <button
+              onClick={handleDispense}
+              className="mt-3 bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700"
+            >
+              Mark as Dispensed
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
