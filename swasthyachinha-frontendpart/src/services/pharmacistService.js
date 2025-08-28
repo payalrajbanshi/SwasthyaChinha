@@ -17,3 +17,12 @@ export const dispenseMedicine = async (prescriptionId, token) => {
   );
   return response.data;
 };
+
+export const getPharmacistProfile = async (token) => {
+  //const res = await fetch("/api/pharmacist/profile", {
+  const res = await axios.get(`${API_URL}/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profile");
+  return await res.json();
+};

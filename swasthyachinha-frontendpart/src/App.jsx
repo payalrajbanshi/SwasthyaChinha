@@ -595,7 +595,7 @@ import Register from "./pages/Auth/Register";
 
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import PatientDashboard from "./pages/Patient/Dashboard";
-import PharmacistDashboard from "./pages/pharmacist/PharmacistDashboard";
+import PharmacistDashboard from "./pages/Pharmacist/PharmacistDashboard";
 import HospitalDashboard from "./pages/HospitalAdmin/Dashboard";
 import RegisterDoctor from "./pages/HospitalAdmin/RegisterDoctor";
 import DoctorList from "./components/HospitalAdmin/DoctorList";

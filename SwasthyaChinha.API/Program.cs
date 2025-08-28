@@ -382,7 +382,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IHospitalService, HospitalService>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
-//builder.Services.AddScoped<IPharmacistService, PharmacistService>();
+builder.Services.AddScoped<IPharmacistService, PharmacistService>();
 builder.Services.AddScoped<IPrescriptionService, PrescriptionService>();
 
 // 🔹 6. AutoMapper and MVC Controllers

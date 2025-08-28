@@ -166,15 +166,31 @@
 //     </div>
 //   );
 // }
-import { useState } from "react";
-import { getPrescriptionByQR, dispenseMedicine } from "../../services/pharmacistService";
+import { useState, useEffect } from "react";
+import { getPrescriptionByQR, dispenseMedicine, getPharmacistProfile } from "../../services/pharmacistService";
 import QRScanner from "../../components/pharmacist/QRScanner";
+import PrescriptionCard from "../../components/pharmacist/PrescriptionCard";
+import PharmacistProfileCard from "../../components/pharmacist/PharmacistProfileCard";
 
 export default function PharmacistDashboard() {
   const [qr, setQr] = useState("");
+  const [pharmacist, setPharmacist] = useState(null);
   const [prescription, setPrescription] = useState(null);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
+
+   useEffect(() => {
+  const token = localStorage.getItem("token");
+  const fetchProfile = async () => {
+    try {
+      const res = await getPharmacistProfile(token);
+      setPharmacist(res);
+    } catch (err) {
+      console.log("Failed to fetch pharmacist profile", err);
+    }
+  };
+  fetchProfile();
+}, [token]);
 
   const fetchPrescription = async (qrCode) => {
     try {
@@ -196,8 +212,10 @@ export default function PharmacistDashboard() {
     }
   };
 
+ 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-6">
+      {pharmacist && <PharmacistProfileCard pharmacist={pharmacist} />}
       <h1 className="text-xl font-bold mb-4">Pharmacist Dashboard</h1>
 
       {/* QR Scanner */}
@@ -227,6 +245,13 @@ export default function PharmacistDashboard() {
 
       {/* Error */}
       {error && <p className="text-red-500">{error}</p>}
+            {/* Prescription Details */}
+      {prescription && (
+        <PrescriptionCard
+          prescription={prescription}
+          onDispense={handleDispense}
+        />
+      )}
 
       {/* Prescription details */}
       {prescription && (
