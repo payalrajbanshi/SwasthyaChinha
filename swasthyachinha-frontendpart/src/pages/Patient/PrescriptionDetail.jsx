@@ -89,24 +89,78 @@
 //     </div>
 //   );
 // }
+
+
+
+// import React from "react";
+// import MedicineList from "../../components/Patient/MedicineList";
+// import QRCodeDisplay from "../../components/Patient/QRCodeDisplay";
+
+// export default function PrescriptionDetail({ prescription }) {
+//   if (!prescription) return <p>Loading...</p>;
+
+//   return (
+//     <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-6 mt-4">
+//       <h1 className="text-2xl font-bold mb-4">Digital Prescription</h1>
+//       <p><strong>Doctor:</strong> {prescription.doctorName}</p>
+//       <p><strong>Hospital:</strong> {prescription.hospitalName}</p>
+//       <p><strong>Date:</strong> {new Date(prescription.dateIssued).toLocaleDateString()}</p>
+
+//       <MedicineList medicines={prescription.medicines} />
+
+//       <div className="flex justify-end mt-4">
+//         <QRCodeDisplay value={prescription.id} />
+//       </div>
+//     </div>
+//   );
+// }
+
+
 import React from "react";
-import MedicineList from "../../components/Patient/MedicineList";
-import QRCodeDisplay from "../../components/Patient/QRCodeDisplay";
+import QRCode from "react-qr-code";
 
 export default function PrescriptionDetail({ prescription }) {
   if (!prescription) return <p>Loading...</p>;
 
   return (
-    <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-xl p-6 mt-4">
-      <h1 className="text-2xl font-bold mb-4">Digital Prescription</h1>
-      <p><strong>Doctor:</strong> {prescription.doctorName}</p>
-      <p><strong>Hospital:</strong> {prescription.hospitalName}</p>
-      <p><strong>Date:</strong> {new Date(prescription.dateIssued).toLocaleDateString()}</p>
+    <div className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-6 mt-6">
+      {/* Hospital Info */}
+      <div className="text-center mb-6">
+        <h1 className="font-bold text-2xl uppercase">{prescription.hospitalName}</h1>
+        <p className="text-sm text-gray-600">{prescription.hospitalAddress}</p>
+      </div>
 
-      <MedicineList medicines={prescription.medicines} />
+      {/* Patient + Doctor Info */}
+      <div className="flex justify-between mb-6">
+        <div>
+          <p className="font-semibold text-sm">Patient Name</p>
+          <p>{prescription.patientName}</p>
+          <p className="font-semibold text-sm mt-2">Age</p>
+          <p>{prescription.patientAge}</p>
+        </div>
+        <div className="text-right">
+          <p className="font-semibold">{prescription.doctorName}, MD</p>
+          <p className="text-sm">{prescription.doctorSpecialty}</p>
+        </div>
+      </div>
 
-      <div className="flex justify-end mt-4">
-        <QRCodeDisplay value={prescription.id} />
+      {/* Medicines */}
+      <div className="mb-6 text-lg italic space-y-2">
+        {prescription.medicines?.map((m, i) => (
+          <p key={i}>
+            {m.name} {m.dosage} – {m.instructions || "as directed"}
+          </p>
+        ))}
+      </div>
+
+      {/* Signature + QR */}
+      <div className="flex justify-between items-center mt-6">
+        <div>
+          <p className="italic">{prescription.doctorName}, MD</p>
+          <div className="border-t border-black w-40 mt-1"></div>
+          <p className="text-xs">Signature</p>
+        </div>
+        <QRCode value={JSON.stringify(prescription)} style={{ width: 80, height: 80 }} />
       </div>
     </div>
   );

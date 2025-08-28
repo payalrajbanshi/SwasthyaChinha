@@ -1423,34 +1423,78 @@ namespace SwasthyaChinha.API.Services
             await _context.SaveChangesAsync();
         }
 
+        // public async Task<List<PatientPrescriptionDTO>> GetPrescriptionsAsync(string userId)
+        // {
+        //     if (!Guid.TryParse(userId, out var userGuid))
+        //         throw new Exception("Invalid userId format");
+
+        //     var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userGuid);
+        //     if (patient == null) throw new Exception("Patient not found");
+
+        //     return await _context.Prescriptions
+        //         .Where(p => p.PatientId == patient.Id)
+        //         .Include(p => p.Doctor)
+        //         .Include(p => p.Hospital)
+        //         .Include(p => p.Items)
+        //         .Include(p => p.Patient)               // include Patient
+        // .ThenInclude(pt => pt.User)       // include User for DOB
+        //         .Select(p => new PatientPrescriptionDTO
+        //         {
+        //             PrescriptionId = p.Id.ToString(),
+        //             DoctorName = p.Doctor != null ? p.Doctor.FullName : "N/A",
+        //             HospitalName = p.Hospital != null ? p.Hospital.Name : "N/A",
+        //             DateIssued = p.CreatedAt,
+        //             Medicines = p.Items.Select(i => new MedicineDTO
+        //             {
+        //                 Name = i.MedicineName,
+        //                 Dosage = i.Dosage,
+        //                 Price = i.Cost
+        //             }).ToList(),
+        //              PatientName = p.Patient?.FullName ?? "Unknown Patient",
+        // PatientAge = p.Patient?.User?.DateOfBirth.HasValue == true 
+        //              ? (int)((DateTime.Now - p.Patient.User.DateOfBirth.Value).TotalDays / 365.25) 
+        //              : 0
+        //         })
+        //         .ToListAsync();
+        // }
         public async Task<List<PatientPrescriptionDTO>> GetPrescriptionsAsync(string userId)
+{
+    if (!Guid.TryParse(userId, out var userGuid))
+        throw new Exception("Invalid userId format");
+
+    var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userGuid);
+    if (patient == null) throw new Exception("Patient not found");
+
+    var prescriptions = await _context.Prescriptions
+        .Where(p => p.PatientId == patient.Id)
+        .Include(p => p.Doctor)
+        .Include(p => p.Hospital)
+        .Include(p => p.Items)
+        .Include(p => p.Patient)
+            .ThenInclude(pt => pt.User)
+        .ToListAsync();   // 🚀 move to memory
+
+    return prescriptions.Select(p => new PatientPrescriptionDTO
+    {
+        PrescriptionId = p.Id.ToString(),
+        DoctorName = p.Doctor != null ? p.Doctor.FullName : "N/A",
+        HospitalName = p.Hospital != null ? p.Hospital.Name : "N/A",
+        DateIssued = p.CreatedAt,
+        Medicines = p.Items.Select(i => new MedicineDTO
         {
-            if (!Guid.TryParse(userId, out var userGuid))
-                throw new Exception("Invalid userId format");
+            Name = i.MedicineName,
+            Dosage = i.Dosage,
+            Price = i.Cost
+        }).ToList(),
 
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.UserId == userGuid);
-            if (patient == null) throw new Exception("Patient not found");
+        // ✅ Now safe, EF already materialized the objects
+        PatientName = p.Patient?.FullName ?? "Unknown Patient",
+        PatientAge = p.Patient?.User?.DateOfBirth.HasValue == true
+                     ? (int)((DateTime.Now - p.Patient.User.DateOfBirth.Value).TotalDays / 365.25)
+                     : 0
+    }).ToList();
+}
 
-            return await _context.Prescriptions
-                .Where(p => p.PatientId == patient.Id)
-                .Include(p => p.Doctor)
-                .Include(p => p.Hospital)
-                .Include(p => p.Items)
-                .Select(p => new PatientPrescriptionDTO
-                {
-                    PrescriptionId = p.Id.ToString(),
-                    DoctorName = p.Doctor != null ? p.Doctor.FullName : "N/A",
-                    HospitalName = p.Hospital != null ? p.Hospital.Name : "N/A",
-                    DateIssued = p.CreatedAt,
-                    Medicines = p.Items.Select(i => new MedicineDTO
-                    {
-                        Name = i.MedicineName,
-                        Dosage = i.Dosage,
-                        Price = i.Cost
-                    }).ToList()
-                })
-                .ToListAsync();
-        }
 
         // public async Task<LastVisitDTO?> GetLastVisitAsync(string userId)
         // {

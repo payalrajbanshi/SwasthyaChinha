@@ -254,6 +254,7 @@ using System.Security.Claims;
 namespace SwasthyaChinha.API.Controllers
 {
     [Route("api/[controller]")]
+    //[Route("api/Doctor/prescribe")]
     [ApiController]
     [Authorize(Roles = "Doctor,Admin")]
     public class PrescriptionController : ControllerBase
@@ -267,8 +268,8 @@ namespace SwasthyaChinha.API.Controllers
             _prescriptionService = prescriptionService;
         }
 
-        // ✅ Create Prescription (Doctor handles QR generation)
-        [HttpPost]
+        //✅ Create Prescription (Doctor handles QR generation)
+        [HttpPost("prescribe")]
         public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionDTO model)
         {
             if (model == null || model.Medicines == null || model.Medicines.Count == 0)

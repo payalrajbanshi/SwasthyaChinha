@@ -411,8 +411,102 @@ namespace SwasthyaChinha.API.Services
         //     // Return QR for frontend
         //     return qrCodeBase64;
         // }
-        public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
+
+
+
+        //         public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
+        // {
+        //     if (!Guid.TryParse(doctorId, out var doctorGuid))
+        //         throw new UnauthorizedAccessException("Invalid doctor token");
+
+        //     if (!Guid.TryParse(dto.PatientId, out var patientGuid))
+        //         throw new ArgumentException("Invalid PatientId GUID format");
+
+        //     if (!Guid.TryParse(dto.HospitalId, out var hospitalGuid))
+        //         throw new ArgumentException("Invalid HospitalId GUID format");
+
+        //     var prescription = new Prescription
+        //     {
+        //         DoctorId = doctorGuid,
+        //         PatientId = patientGuid,
+        //         HospitalId = hospitalGuid,
+        //         CreatedAt = DateTime.UtcNow,
+        //         IsDispensed = false,
+        //         Items = dto.Medicines.Select(m => new PrescriptionItem
+        //         {
+        //             MedicineName = m.Name,
+        //             Dosage = m.Dosage,
+        //             Cost = 0
+        //         }).ToList(),
+        //         TotalCost = 0
+        //     };
+
+        //     _context.Prescriptions.Add(prescription);
+        //     await _context.SaveChangesAsync();
+
+        //     // Generate & store QR
+        //     var qrService = new QRService();
+        //     var qrData = $"PRESC-{prescription.Id}";
+        //     var qrCodeBase64 = qrService.GenerateQRCode(qrData);
+
+        //     prescription.QRCodeData = qrData;   // <-- new field (Step 2)
+        //     prescription.QRCode = qrCodeBase64; // base64 image
+        //     await _context.SaveChangesAsync();
+
+        //     return qrCodeBase64;
+        // }
+
+
+        //         public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
+        // {
+        //     // Validate GUIDs
+        //     if (!Guid.TryParse(doctorId, out var doctorGuid))
+        //         throw new UnauthorizedAccessException("Invalid doctor token");
+
+        //     if (!Guid.TryParse(dto.PatientId, out var patientGuid))
+        //         throw new ArgumentException("Invalid PatientId GUID format");
+
+        //     if (!Guid.TryParse(dto.HospitalId, out var hospitalGuid))
+        //         throw new ArgumentException("Invalid HospitalId GUID format");
+
+        //     // Create Prescription entity
+        //     var prescription = new Prescription
+        //     {
+        //         DoctorId = doctorGuid,
+        //         PatientId = patientGuid,
+        //         HospitalId = hospitalGuid,
+        //         CreatedAt = DateTime.UtcNow,
+        //         IsDispensed = false,
+        //         Items = dto.Medicines.Select(m => new PrescriptionItem
+        //         {
+        //             MedicineName = m.Name,
+        //             Dosage = m.Dosage,
+        //             Cost = 0
+        //         }).ToList(),
+        //         TotalCost = 0
+        //     };
+
+        //     // Save initially to generate Prescription.Id
+        //     _context.Prescriptions.Add(prescription);
+        //     await _context.SaveChangesAsync();
+
+        //     // Generate QR code using Prescription ID
+        //     var qrService = new QRService();
+        //     var qrData = $"PRESC-{prescription.Id}";           // You can include more info if needed
+        //     var qrCodeBase64 = qrService.GenerateQRCode(qrData);
+
+        //     // Store QR code in the entity
+        //     prescription.QRCodeData = qrData;                  // optional: store raw data
+        //     prescription.QRCode = qrCodeBase64;               // base64 image for DB
+        //     await _context.SaveChangesAsync();
+
+        //     return qrCodeBase64;
+        // }
+
+
+public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
 {
+    // Validate GUIDs
     if (!Guid.TryParse(doctorId, out var doctorGuid))
         throw new UnauthorizedAccessException("Invalid doctor token");
 
@@ -422,6 +516,7 @@ namespace SwasthyaChinha.API.Services
     if (!Guid.TryParse(dto.HospitalId, out var hospitalGuid))
         throw new ArgumentException("Invalid HospitalId GUID format");
 
+    // Create prescription entity
     var prescription = new Prescription
     {
         DoctorId = doctorGuid,
@@ -435,19 +530,22 @@ namespace SwasthyaChinha.API.Services
             Dosage = m.Dosage,
             Cost = 0
         }).ToList(),
-        TotalCost = 0
+        TotalCost = 0,
+        QRCode = "TEMP"  // temporary placeholder to satisfy NOT NULL column
     };
 
+    // Add and save to get the database-generated Id
     _context.Prescriptions.Add(prescription);
     await _context.SaveChangesAsync();
 
-    // Generate & store QR
+    // Now generate QR code with actual prescription.Id
     var qrService = new QRService();
     var qrData = $"PRESC-{prescription.Id}";
     var qrCodeBase64 = qrService.GenerateQRCode(qrData);
 
-    prescription.QRCodeData = qrData;   // <-- new field (Step 2)
-    prescription.QRCode = qrCodeBase64; // base64 image
+    // Update the prescription with the real QR
+    prescription.QRCodeData = qrData;
+    prescription.QRCode = qrCodeBase64;
     await _context.SaveChangesAsync();
 
     return qrCodeBase64;

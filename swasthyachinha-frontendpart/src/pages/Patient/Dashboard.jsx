@@ -806,72 +806,107 @@
 //   );
 // }
 
+// import React, { useEffect, useState } from "react";
+// import { getProfile, getPrescriptions } from "../../services/api";
+// import TopNav from "../../components/Patient/TopNav";
+// import BottomNav from "../../components/Patient/BottomNav";
+// //import SummaryCard from "../../components/Patient/SummaryCard";
+// import PrescriptionCard from "../../components/Patient/PrescriptionCard";
+// import PrescriptionFeed from "../../components/Patient/PrescriptionFeed"; // 👈 added here
+
+// export default function Dashboard() {
+//   const [profile, setProfile] = useState(null);
+//   const [prescriptions, setPrescriptions] = useState([]);
+//   //const [lastVisit, setLastVisit] = useState(null);
+//   //const [lastPrescription, setLastPrescription] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState("");
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         setLoading(true);
+//         const profResp = await getProfile();
+//         setProfile(profResp.data);
+
+//         const presResp = await getPrescriptions();
+//         setPrescriptions(presResp.data || []);
+
+//         // const lvResp = await getLastVisit();
+//         // setLastVisit(lvResp.data || null);
+
+//         // const lpResp = await getLastPrescription();
+//         // setLastPrescription(lpResp.data || null);
+
+//       } catch (err) {
+//         console.error(err);
+//         setError(err.response?.data?.message || err.message || "Failed to load dashboard.");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchData();
+//   }, []);
+
+//   if (loading) return <div>Loading...</div>;
+//   if (error) return <div className="text-red-500">{error}</div>;
+
+//   return (
+//     <div className="p-6 space-y-6">
+//       <TopNav profile={profile} />
+
+//       {/* Summary Section */}
+//       {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//         <SummaryCard title="Last Visit" data={lastVisit} />
+//         <SummaryCard title="Last Prescription" data={lastPrescription} />
+//       </div> */}
+
+//       {/* Existing Prescription List */}
+//       <div className="bg-white shadow rounded-lg p-4">
+//         <h2 className="text-xl font-bold mb-4">📋 Prescription Feed (From API)</h2>
+//         {prescriptions.length > 0 ? prescriptions.map(p => (
+//           <PrescriptionCard key={p.prescriptionId} prescription={p} />
+//         )) : <p className="text-gray-500">No prescriptions found.</p>}
+//       </div>
+
+//       {/* New PrescriptionFeed Component */}
+//       <div className="bg-white shadow rounded-lg p-4">
+//         <h2 className="text-xl font-bold mb-4">📌 Prescription Feed Component</h2>
+//         <PrescriptionFeed />
+//       </div>
+
+//       <BottomNav />
+//     </div>
+//   );
+// }
 import React, { useEffect, useState } from "react";
-import { getProfile, getPrescriptions } from "../../services/api";
 import TopNav from "../../components/Patient/TopNav";
 import BottomNav from "../../components/Patient/BottomNav";
-//import SummaryCard from "../../components/Patient/SummaryCard";
-import PrescriptionCard from "../../components/Patient/PrescriptionCard";
-import PrescriptionFeed from "../../components/Patient/PrescriptionFeed"; // 👈 added here
+import PrescriptionFeed from "../../components/Patient/PrescriptionFeed";
+import { getProfile } from "../../services/api";
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
-  const [prescriptions, setPrescriptions] = useState([]);
-  //const [lastVisit, setLastVisit] = useState(null);
-  //const [lastPrescription, setLastPrescription] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProfile = async () => {
       try {
-        setLoading(true);
-        const profResp = await getProfile();
-        setProfile(profResp.data);
-
-        const presResp = await getPrescriptions();
-        setPrescriptions(presResp.data || []);
-
-        // const lvResp = await getLastVisit();
-        // setLastVisit(lvResp.data || null);
-
-        // const lpResp = await getLastPrescription();
-        // setLastPrescription(lpResp.data || null);
-
+        const res = await getProfile();
+        setProfile(res.data);
       } catch (err) {
-        console.error(err);
-        setError(err.response?.data?.message || err.message || "Failed to load dashboard.");
-      } finally {
-        setLoading(false);
+        console.error("Failed to load profile:", err);
       }
     };
-    fetchData();
+    fetchProfile();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  if (!profile) return <div>Loading...</div>;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-4">
       <TopNav profile={profile} />
 
-      {/* Summary Section */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SummaryCard title="Last Visit" data={lastVisit} />
-        <SummaryCard title="Last Prescription" data={lastPrescription} />
-      </div> */}
-
-      {/* Existing Prescription List */}
-      <div className="bg-white shadow rounded-lg p-4">
-        <h2 className="text-xl font-bold mb-4">📋 Prescription Feed (From API)</h2>
-        {prescriptions.length > 0 ? prescriptions.map(p => (
-          <PrescriptionCard key={p.prescriptionId} prescription={p} />
-        )) : <p className="text-gray-500">No prescriptions found.</p>}
-      </div>
-
-      {/* New PrescriptionFeed Component */}
-      <div className="bg-white shadow rounded-lg p-4">
-        <h2 className="text-xl font-bold mb-4">📌 Prescription Feed Component</h2>
+      <div className="flex h-[75vh] gap-4">
         <PrescriptionFeed />
       </div>
 

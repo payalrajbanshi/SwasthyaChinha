@@ -3,18 +3,18 @@ import api from "./api"; // Axios instance
 
 // Fetch doctor profile
 export const getDoctorProfile = async () => {
-  const res = await api.get("/Doctor/profile");
+  const res = await api.get("/doctor/profile");
   return res.data;
 };
 
 // Fetch my patients
 export const getDoctorPatients = async () => {
-  const res = await api.get("/Doctor/patients");
+  const res = await api.get("/doctor/patients");
   return res.data;
 };
 // Create a new prescription
 export const createPrescription = async (payload) => {
-  const res = await api.post("/Doctor/prescribe", payload);
+  const res = await api.post("/doctor/prescribe", payload);
   return res.data;
 };
 // src/services/doctorService.js

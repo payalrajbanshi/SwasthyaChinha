@@ -2473,12 +2473,270 @@
 
 
 
+// import React, { useEffect, useState, useRef } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { createPrescription, getDoctorProfile } from "../../services/doctorService";
+// import Sidebar from "../../components/dashboard/Sidebar";
+// import api from "../../services/api";
+// import jwt_decode from "jwt-decode";
+
+// const PrescriptionPage = () => {
+//   const navigate = useNavigate();
+//   const [loading, setLoading] = useState(true);
+//   const [doctorInfo, setDoctorInfo] = useState({});
+//   const [formData, setFormData] = useState({
+//     patientId: "",
+//     hospitalId: "",
+//     medicines: [{ name: "", dosage: "" }]
+//   });
+//   const [qrCode, setQrCode] = useState(null);
+//   const [successMsg, setSuccessMsg] = useState("");
+
+//   // Patient search states
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [searchResults, setSearchResults] = useState([]);
+//   const [selectedPatient, setSelectedPatient] = useState(null);
+//   const searchTimeout = useRef(null); // For debouncing
+
+//   // Fetch doctor profile
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       try {
+//         const profile = await getDoctorProfile();
+
+//         // Get hospitalId from JWT token if profile.hospitalId is null
+//         let hospitalId = profile.hospitalId;
+//         if (!hospitalId) {
+//           const token = localStorage.getItem("token");
+//           if (token) {
+//             const decoded = jwt_decode(token);
+//             hospitalId = decoded["hospitalId"] || null;
+//           }
+//         }
+
+//         setDoctorInfo(profile);
+//         setFormData((prev) => ({
+//           ...prev,
+//           hospitalId: hospitalId || ""
+//         }));
+//       } catch (err) {
+//         console.error("Error fetching profile", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProfile();
+//   }, []);
+
+//   // Debounced search
+//   const handleSearch = (value) => {
+//     setSearchQuery(value);
+//     setSelectedPatient(null);
+
+//     if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
+//     if (value.trim().length < 2) {
+//       setSearchResults([]);
+//       return;
+//     }
+
+//     searchTimeout.current = setTimeout(async () => {
+//       try {
+//         const res = await api.get(`/doctor/search-patients?query=${value}`);
+//         setSearchResults(Array.isArray(res.data) ? res.data : []);
+//       } catch (err) {
+//         console.error("Search failed", err);
+//         setSearchResults([]);
+//       }
+//     }, 500);
+//   };
+
+//   const selectPatient = (patient) => {
+//     setSelectedPatient(patient);
+//     setSearchQuery(patient.name);
+//     setFormData((prev) => ({
+//       ...prev,
+//       patientId: patient.id
+//     }));
+//     setSearchResults([]);
+//   };
+
+//   const handleMedicineChange = (index, field, value) => {
+//     const updated = [...formData.medicines];
+//     updated[index][field] = value;
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   const addMedicine = () => {
+//     setFormData({
+//       ...formData,
+//       medicines: [...formData.medicines, { name: "", dosage: "" }]
+//     });
+//   };
+
+//   const removeMedicine = (index) => {
+//     const updated = formData.medicines.filter((_, i) => i !== index);
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setSuccessMsg("");
+//     setQrCode(null);
+
+//     try {
+//       const res = await createPrescription(formData);
+//       if (res.qrCode) {
+//         setQrCode(res.qrCode);
+//         setSuccessMsg("✅ Prescription created successfully!");
+//       }
+//     } catch (error) {
+//       console.error("Error creating prescription:", error);
+//       alert("❌ Failed to create prescription");
+//     }
+//   };
+
+//   if (loading) return <div className="p-6">Loading prescription page...</div>;
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       <Sidebar />
+//       <div className="flex-1 p-6">
+//         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
+//           {/* Hospital Info */}
+//           <div className="text-center border-b pb-3">
+//             <h1 className="text-2xl font-bold">{doctorInfo.hospitalName}</h1>
+//             <p className="text-gray-600">{doctorInfo.hospitalAddress}</p>
+//           </div>
+
+//           {/* Doctor Info */}
+//           <div className="flex justify-between mt-4 border-b pb-3">
+//             <div>
+//               <p className="font-semibold">{doctorInfo.fullName}</p>
+//               <p className="text-gray-600">{doctorInfo.specialty}</p>
+//             </div>
+//             {doctorInfo.signatureUrl && (
+//               <img
+//                 src={doctorInfo.signatureUrl}
+//                 alt="Doctor Signature"
+//                 className="h-12"
+//               />
+//             )}
+//           </div>
+
+//           {/* Prescription Form */}
+//           <form onSubmit={handleSubmit} className="mt-6">
+//             {/* Patient Search */}
+//             <div className="mb-4">
+//               <label className="block font-medium mb-1">Search Patient</label>
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => handleSearch(e.target.value)}
+//                 placeholder="Type patient name or phone..."
+//                 className="border rounded p-2 w-full"
+//               />
+//               {searchResults.length > 0 && (
+//                 <ul className="border rounded bg-white mt-1 max-h-40 overflow-y-auto">
+//                   {searchResults.map((p) => {
+//                     const regex = new RegExp(`(${searchQuery})`, "gi");
+//                     const highlightedName = p.name.replace(
+//                       regex,
+//                       (match) => `<span class="bg-yellow-200">${match}</span>`
+//                     );
+//                     const highlightedPhone = p.phone.replace(
+//                       regex,
+//                       (match) => `<span class="bg-yellow-200">${match}</span>`
+//                     );
+//                     return (
+//                       <li
+//                         key={p.id}
+//                         onClick={() => selectPatient(p)}
+//                         className="p-2 hover:bg-gray-200 cursor-pointer"
+//                         dangerouslySetInnerHTML={{ __html: `${highlightedName} — ${highlightedPhone}` }}
+//                       />
+//                     );
+//                   })}
+//                 </ul>
+//               )}
+//               {selectedPatient && (
+//                 <p className="mt-2 text-green-600">
+//                   ✅ Selected: {selectedPatient.name} ({selectedPatient.id})
+//                 </p>
+//               )}
+//             </div>
+
+//             {/* Medicines */}
+//             <div className="mb-4">
+//               <label className="block font-medium">Medicines</label>
+//               {formData.medicines.map((med, index) => (
+//                 <div key={index} className="flex gap-2 mb-2">
+//                   <input
+//                     type="text"
+//                     placeholder="Medicine Name"
+//                     value={med.name}
+//                     onChange={(e) => handleMedicineChange(index, "name", e.target.value)}
+//                     className="border p-2 flex-1 rounded"
+//                     required
+//                   />
+//                   <input
+//                     type="text"
+//                     placeholder="Dosage"
+//                     value={med.dosage}
+//                     onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
+//                     className="border p-2 flex-1 rounded"
+//                     required
+//                   />
+//                   {index > 0 && (
+//                     <button
+//                       type="button"
+//                       onClick={() => removeMedicine(index)}
+//                       className="bg-red-500 text-white px-2 rounded"
+//                     >
+//                       ✕
+//                     </button>
+//                   )}
+//                 </div>
+//               ))}
+//               <button type="button" onClick={addMedicine} className="text-blue-500">
+//                 ➕ Add Medicine
+//               </button>
+//             </div>
+
+//             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded w-full">
+//               Send Prescription
+//             </button>
+//           </form>
+
+//           {/* QR Code */}
+//           {qrCode && (
+//             <div className="mt-6 text-center">
+//               <img
+//                 src={`data:image/png;base64,${qrCode}`}
+//                 alt="Prescription QR"
+//                 className="mx-auto w-40 h-40"
+//               />
+//               <p className="mt-2 text-green-600">{successMsg}</p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PrescriptionPage;
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPrescription, getDoctorProfile } from "../../services/doctorService";
 import Sidebar from "../../components/dashboard/Sidebar";
 import api from "../../services/api";
-import jwt_decode from "jwt-decode";
+//import jwt_decode from "jwt-decode"; // ✅ Updated import
+//import jwt_decode from "jwt-decode/dist/jwt-decode.js";
+//import jwt_decode from "jwt-decode/build/jwt-decode.esm.js";
+import * as jwt_decode from "jwt-decode";
+
+
 
 const PrescriptionPage = () => {
   const navigate = useNavigate();
@@ -2509,7 +2767,7 @@ const PrescriptionPage = () => {
         if (!hospitalId) {
           const token = localStorage.getItem("token");
           if (token) {
-            const decoded = jwt_decode(token);
+            const decoded = jwt_decode.default(token); // ✅ No change here
             hospitalId = decoded["hospitalId"] || null;
           }
         }

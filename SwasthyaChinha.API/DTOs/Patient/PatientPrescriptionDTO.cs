@@ -10,6 +10,8 @@ namespace SwasthyaChinha.API.DTOs.Patient
         public DateTime DateIssued { get; set; }
         public List<MedicineDTO> Medicines { get; set; }
         //public decimal TotalCost { get; set; }
+        public string PatientName { get; set; }
+        public int PatientAge { get; set; } // compute from DateOfBirth
         public string QRCodeData => PrescriptionId;
     }
     //  public class MedicineDTO
