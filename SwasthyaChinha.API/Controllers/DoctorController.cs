@@ -94,8 +94,13 @@ namespace SwasthyaChinha.API.Controllers
         public async Task<IActionResult> CreatePrescription(CreatePrescriptionDTO dto)
         {
             var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(doctorId))
+        return Unauthorized("Invalid token");
+            try
+            {
+    
 
-            string qrCodeBase64 = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
+            var qrCodeBase64 = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
 
             return Ok(new
             {
@@ -103,6 +108,20 @@ namespace SwasthyaChinha.API.Controllers
                 qrCode = qrCodeBase64
             });
         }
+         catch (ArgumentException ex)
+    {
+        return BadRequest(new { message = ex.Message });
+    }
+    catch (UnauthorizedAccessException ex)
+    {
+        return Unauthorized(new { message = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = $"Server error: {ex.Message}" });
+    }
+}
+        
 
         [HttpGet("patients")]
         public async Task<IActionResult> GetMyPatients()

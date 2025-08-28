@@ -2478,7 +2478,7 @@ import { useNavigate } from "react-router-dom";
 import { createPrescription, getDoctorProfile } from "../../services/doctorService";
 import Sidebar from "../../components/dashboard/Sidebar";
 import api from "../../services/api";
-import * as jwt_decode from "jwt-decode";
+import jwt_decode from "jwt-decode";
 
 const PrescriptionPage = () => {
   const navigate = useNavigate();

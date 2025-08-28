@@ -101,7 +101,7 @@ namespace SwasthyaChinha.API.Services
                 .Include(p => p.Doctor)
                 .Include(p => p.Hospital)
                 .Include(p => p.Patient)
-                .FirstOrDefaultAsync(p => p.QRCode == qrCodeData);
+                .FirstOrDefaultAsync(p => p.QRCodeData == qrCodeData);
 
             if (prescription == null)
                 throw new Exception("Prescription not found.");

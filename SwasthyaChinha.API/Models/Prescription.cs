@@ -11,6 +11,8 @@ namespace SwasthyaChinha.API.Models
         public Guid HospitalId { get; set; }
         public DateTime CreatedAt { get; set; }
         public string QRCode { get; set; }
+        // NEW: the short string you search by (e.g., "PRESC-123")
+    public string QRCodeData { get; set; }
         public decimal TotalCost { get; set; }
         public bool IsDispensed { get; set; } = false; // ✅ New property
 

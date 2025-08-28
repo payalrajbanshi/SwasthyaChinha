@@ -86,6 +86,20 @@ namespace SwasthyaChinha.API.Data
         .HasForeignKey(p => p.HospitalId)
         .OnDelete(DeleteBehavior.Restrict);
 
+          // 🔗 Prescription ↔ Doctor (User with Role = Doctor)
+    builder.Entity<Prescription>()
+        .HasOne(p => p.Doctor)
+        .WithMany()
+        .HasForeignKey(p => p.DoctorId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    // 🔗 Prescription ↔ Patient (User with Role = Patient)
+    builder.Entity<Prescription>()
+        .HasOne(p => p.Patient)
+        .WithMany()
+        .HasForeignKey(p => p.PatientId)
+        .OnDelete(DeleteBehavior.Restrict);
+
     builder.Entity<PrescriptionItem>()
         .Property(p => p.Cost)
         .HasPrecision(18, 2);
