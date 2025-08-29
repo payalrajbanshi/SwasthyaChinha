@@ -17,6 +17,7 @@ namespace SwasthyaChinha.API.Models
     public string QRCodeData { get; set; }
         public decimal TotalCost { get; set; }
         public bool IsDispensed { get; set; } = false; // ✅ New property
+        public string Diagnosis { get; set; }
 
         public ICollection<PrescriptionItem> Items { get; set; } = new List<PrescriptionItem>();
          // ✅ Add missing navigation properties

@@ -523,6 +523,7 @@ public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, str
         PatientId = patientGuid,
         HospitalId = hospitalGuid,
         CreatedAt = DateTime.UtcNow,
+         Diagnosis = dto.Diagnosis,
         IsDispensed = false,
         Items = dto.Medicines.Select(m => new PrescriptionItem
         {

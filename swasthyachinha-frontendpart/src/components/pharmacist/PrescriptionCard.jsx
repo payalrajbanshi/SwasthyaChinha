@@ -5,6 +5,12 @@ export default function PrescriptionCard({ prescription, onDispense }) {
       <p>Patient: {prescription.patientName}</p>
       <p>Doctor: {prescription.doctorName}</p>
       <p>Hospital: {prescription.hospitalName}</p>
+      {/* ✅ Show Diagnosis */}
+{prescription.diagnosis && (
+  <p className="mt-2 text-gray-700">
+    <span className="font-semibold">Diagnosis:</span> {prescription.diagnosis}
+  </p>
+)}
 
       <h3 className="mt-2 font-semibold">Medicines</h3>
       <ul className="list-disc pl-5">

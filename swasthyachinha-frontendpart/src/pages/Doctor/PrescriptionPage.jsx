@@ -2745,6 +2745,7 @@ const PrescriptionPage = () => {
   const [formData, setFormData] = useState({
     patientId: "",
     hospitalId: "",
+    diagnosis: "",
     medicines: [{ name: "", dosage: "" }]
   });
   const [qrCode, setQrCode] = useState(null);
@@ -2923,6 +2924,20 @@ const PrescriptionPage = () => {
                 </p>
               )}
             </div>
+            {/* Diagnosis / Disease */}
+<div className="mb-4">
+  <label className="block font-medium mb-1">Diagnosis / Disease</label>
+  <input
+    type="text"
+    placeholder="Enter diagnosis or disease"
+    value={formData.diagnosis}
+    onChange={(e) =>
+      setFormData({ ...formData, diagnosis: e.target.value })
+    }
+    className="border rounded p-2 w-full"
+  />
+</div>
+
 
             {/* Medicines */}
             <div className="mb-4">

@@ -143,6 +143,14 @@ export default function PrescriptionDetail({ prescription }) {
           <p className="text-sm">{prescription.doctorSpecialty}</p>
         </div>
       </div>
+      {/* Diagnosis */}
+{prescription.diagnosis && (
+  <div className="mb-6">
+    <p className="font-semibold text-sm">Diagnosis</p>
+    <p className="italic text-lg">{prescription.diagnosis}</p>
+  </div>
+)}
+
 
       {/* Medicines */}
       <div className="mb-6 text-lg italic space-y-2">
