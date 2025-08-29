@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SwasthyaChinha.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c591c20bbbc18708551ff20862e08ab427da2ec")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ca9ecb5a7f7db18a15b5f18cafeab7aa16aa236b")]
 [assembly: System.Reflection.AssemblyProductAttribute("SwasthyaChinha.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SwasthyaChinha.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

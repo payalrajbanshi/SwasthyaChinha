@@ -2847,7 +2847,7 @@ const PrescriptionPage = () => {
       const res = await createPrescription(formData);
       if (res.qrCode) {
         setQrCode(res.qrCode);
-        setSuccessMsg("✅ Prescription created successfully!");
+        setSuccessMsg("✅ Prescription sent successfully!");
       }
     } catch (error) {
       console.error("Error creating prescription:", error);

@@ -491,7 +491,7 @@ namespace SwasthyaChinha.API.Services
                 {
                     PatientId = g.Key.ToString(),
                     TotalVisits = g.Count(),
-                    TotalExpense = g.Sum(p => p.TotalCost)
+                    TotalExpense = g.Sum(p => p.TotalCost) ??0
                 }).ToListAsync();
 
             return stats;
@@ -528,9 +528,9 @@ namespace SwasthyaChinha.API.Services
         ActivePrescriptions = prescriptions.Count(p => !p.IsDispensed),
         QRCodesGeneratedToday = prescriptions.Count(p => p.CreatedAt.Date == today),
         TotalPatients = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Patient"),
-        TotalExpense = prescriptions.Sum(p => p.TotalCost),
+        TotalExpense = prescriptions.Sum(p =>(decimal?)p.TotalCost) ??0,
         UniquePatients = prescriptions.Select(p => p.PatientId).Distinct().Count(),
-        TotalRevenue = prescriptions.Sum(p => p.TotalCost),
+        TotalRevenue = prescriptions.Sum(p =>(decimal?) p.TotalCost) ??0,
         HospitalName = hospitalUser?.FullName ?? "Unknown",
         Address = hospitalUser?.Address ?? "Not Provided",
         LogoUrl = hospitalUser?.LogoUrl ?? ""
@@ -560,7 +560,7 @@ namespace SwasthyaChinha.API.Services
                 {
                     PatientId = g.Key.ToString(),
                     TotalVisits = g.Count(),
-                    TotalExpense = g.Sum(p => p.TotalCost)
+                    TotalExpense = g.Sum(p => p.TotalCost) ??0
                 }).ToListAsync();
         }
     }
