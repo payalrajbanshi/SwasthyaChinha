@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -55,7 +54,7 @@ namespace SwasthyaChinha.API.Controllers
         }
 
         // ✅ 3. Register Doctor (Authorized only for HospitalAdmin)
-        [Authorize(Roles = "HospitalAdmin")]
+        [Authorize(Roles = "hospitaladmin")]
         [HttpPost("register-doctor")]
         public async Task<IActionResult> RegisterDoctor([FromBody] RegisterDoctorDTO dto)
         // {
@@ -77,7 +76,7 @@ namespace SwasthyaChinha.API.Controllers
 
 
         // ✅ 4. Hospital Stats (Authorized)
-        [Authorize(Roles = "HospitalAdmin")]
+        [Authorize(Roles = "hospitaladmin")]
         [HttpGet("stats")]
         public async Task<IActionResult> GetStats([FromQuery] string hospitalId)
         {
@@ -86,7 +85,7 @@ namespace SwasthyaChinha.API.Controllers
         }
 
         // ✅ 5. List All Doctors (Authorized)
-        [Authorize(Roles = "HospitalAdmin")]
+        [Authorize(Roles = "hospitaladmin")]
         [HttpGet("doctors")]
         public async Task<IActionResult> GetDoctors()
         {
@@ -95,7 +94,7 @@ namespace SwasthyaChinha.API.Controllers
         }
 
         // ✅ 6. List All Patients (Authorized)
-        [Authorize(Roles = "HospitalAdmin")]
+        [Authorize(Roles = "hospitaladmin")]
         [HttpGet("patients")]
         public async Task<IActionResult> GetPatients()
         {
