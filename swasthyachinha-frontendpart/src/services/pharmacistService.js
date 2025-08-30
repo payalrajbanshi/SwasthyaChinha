@@ -23,6 +23,7 @@ export const getPharmacistProfile = async (token) => {
   const res = await axios.get(`${API_URL}/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Failed to fetch profile");
-  return await res.json();
+  // if (!res.ok) throw new Error("Failed to fetch profile");
+  // return await res.json();
+  return res.data;
 };

@@ -180,13 +180,15 @@ export default function PharmacistDashboard() {
   const token = localStorage.getItem("token");
 
    useEffect(() => {
-  const token = localStorage.getItem("token");
+  //const token = localStorage.getItem("token");
+  if (!token) return;
   const fetchProfile = async () => {
     try {
       const res = await getPharmacistProfile(token);
       setPharmacist(res);
     } catch (err) {
       console.log("Failed to fetch pharmacist profile", err);
+      setError("Failed to load profile. Please login again.");
     }
   };
   fetchProfile();
