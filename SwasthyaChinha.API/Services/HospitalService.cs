@@ -75,33 +75,87 @@ namespace SwasthyaChinha.API.Services
             return stats;
         }
 
+        // public async Task<HospitalStatsDTO> GetOverallStatsAsync(string hospitalId)
+        // {
+        //     if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
+        //         throw new ArgumentException("Invalid hospitalId format");
+        //          var today = DateTime.Today;
+
+        //     var prescriptions = await _context.Prescriptions
+        //         .Where(p => p.HospitalId == hospitalGuid)
+        //         .ToListAsync();
+
+
+        //     var hospitalUser = await _context.Users
+        // .FirstOrDefaultAsync(u => u.HospitalId == hospitalGuid && u.Role =="HospitalAdmin");
+
+        //     return new HospitalStatsDTO
+        //     {
+
+        //         TotalDoctors = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Doctor"),
+        //         TotalPrescriptionsIssued = prescriptions.Count,
+        //         PrescriptionsVerifiedToday = prescriptions.Count(p => p.IsDispensed && p.CreatedAt.Date == today),
+        //         ActivePrescriptions = prescriptions.Count(p => !p.IsDispensed),
+        //         QRCodesGeneratedToday = prescriptions.Count(p => p.CreatedAt.Date == today),
+        //         TotalPatients = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Patient"),
+        //         TotalExpense = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
+        //         UniquePatients = prescriptions.Select(p => p.PatientId).Distinct().Count(),
+        //         TotalRevenue = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
+        //         HospitalName = hospital?.Name ?? "Unknown",
+        //         Address = hospital?.Address ?? "Not Provided",
+        //         LogoUrl = hospitalUser?.LogoUrl ?? ""
+        //     };
+        // }
+        //         public async Task<HospitalStatsDTO> GetOverallStatsAsync(string hospitalId)
+        // {
+        //     if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
+        //         throw new ArgumentException("Invalid hospitalId format");
+
+        //     var today = DateTime.Today;
+
+        //     var prescriptions = await _context.Prescriptions
+        //         .Where(p => p.HospitalId == hospitalGuid)
+        //         .ToListAsync();
+
+        //     // ✅ Fetch hospital from Hospitals table
+        //     var hospital = await _context.Hospitals
+        //         .FirstOrDefaultAsync(h => h.Id == hospitalGuid);
+
+        //     return new HospitalStatsDTO
+        //     {
+        //         TotalDoctors = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Doctor"),
+        //         TotalPrescriptionsIssued = prescriptions.Count,
+        //         PrescriptionsVerifiedToday = prescriptions.Count(p => p.IsDispensed && p.CreatedAt.Date == today),
+        //         ActivePrescriptions = prescriptions.Count(p => !p.IsDispensed),
+        //         QRCodesGeneratedToday = prescriptions.Count(p => p.CreatedAt.Date == today),
+        //         TotalPatients = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Patient"),
+        //         TotalExpense = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
+        //         UniquePatients = prescriptions.Select(p => p.PatientId).Distinct().Count(),
+        //         TotalRevenue = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
+
+        //         // ✅ From Hospital table
+        //         HospitalName = hospital?.Name ?? "Unknown",
+        //         Address = hospital?.Address ?? "Not Provided",
+        //         LogoUrl = hospitalUser?.LogoUrl ?? ""   // works if you added LogoUrl to Hospital.cs
+        //     };
+        // }
         public async Task<HospitalStatsDTO> GetOverallStatsAsync(string hospitalId)
         {
             if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
                 throw new ArgumentException("Invalid hospitalId format");
-                 var today = DateTime.Today;
+
+            var today = DateTime.Today;
 
             var prescriptions = await _context.Prescriptions
                 .Where(p => p.HospitalId == hospitalGuid)
                 .ToListAsync();
 
-            // Fetch hospital info from Users with Role = HospitalAdmin
-            // var hospitalUser = await _context.Users
-            //     .FirstOrDefaultAsync(u => u.Id == hospitalGuid && u.Role == "HospitalAdmin");
+            // ✅ Get HospitalAdmin user for this hospital
             var hospitalUser = await _context.Users
-        .FirstOrDefaultAsync(u => u.HospitalId == hospitalGuid && u.Role =="HospitalAdmin");
+                .FirstOrDefaultAsync(u => u.HospitalId == hospitalGuid && u.Role == "HospitalAdmin");
 
             return new HospitalStatsDTO
             {
-                // TotalDoctors = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Doctor"),
-                // TotalPatients = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Patient"),
-                // TotalPrescriptions = prescriptions.Count,
-                // TotalExpense = prescriptions.Sum(p => p.TotalCost),
-                // UniquePatients = prescriptions.Select(p => p.PatientId).Distinct().Count(),
-                // TotalRevenue = prescriptions.Sum(p => p.TotalCost),
-                // HospitalName = hospitalUser?.FullName ?? "Unknown",
-                // Address = hospitalUser?.Address ?? "Not Provided",
-                // LogoUrl = hospitalUser?.LogoUrl ?? ""
                 TotalDoctors = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Doctor"),
                 TotalPrescriptionsIssued = prescriptions.Count,
                 PrescriptionsVerifiedToday = prescriptions.Count(p => p.IsDispensed && p.CreatedAt.Date == today),
@@ -111,9 +165,11 @@ namespace SwasthyaChinha.API.Services
                 TotalExpense = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
                 UniquePatients = prescriptions.Select(p => p.PatientId).Distinct().Count(),
                 TotalRevenue = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
+
+                // ✅ Pull from User (HospitalAdmin)
                 HospitalName = hospitalUser?.FullName ?? "Unknown",
                 Address = hospitalUser?.Address ?? "Not Provided",
-                LogoUrl = hospitalUser?.LogoUrl ?? ""
+                LogoUrl = hospitalUser?.LogoUrl ?? "" 
             };
         }
 
