@@ -146,13 +146,17 @@ namespace SwasthyaChinha.API.Services
 
             var today = DateTime.Today;
 
-            var prescriptions = await _context.Prescriptions
-                .Where(p => p.HospitalId == hospitalGuid)
-                .ToListAsync();
-
+            // var prescriptions = await _context.Prescriptions
+            //     .Where(p => p.HospitalId == hospitalGuid)
+            //     .ToListAsync();
+              var hospital = await _context.Hospitals
+        .FirstOrDefaultAsync(h => h.Id == hospitalGuid);
             // ✅ Get HospitalAdmin user for this hospital
             var hospitalUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.HospitalId == hospitalGuid && u.Role == "HospitalAdmin");
+                    var prescriptions = await _context.Prescriptions
+        .Where(p => p.HospitalId == hospitalGuid)
+        .ToListAsync();
 
             return new HospitalStatsDTO
             {
@@ -167,9 +171,9 @@ namespace SwasthyaChinha.API.Services
                 TotalRevenue = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
 
                 // ✅ Pull from User (HospitalAdmin)
-                HospitalName = hospitalUser?.FullName ?? "Unknown",
-                Address = hospitalUser?.Address ?? "Not Provided",
-                LogoUrl = hospitalUser?.LogoUrl ?? "" 
+                HospitalName = hospital?.Name ?? "Unknown",
+                Address = hospital?.Address ?? "Not Provided",
+                LogoUrl = hospitalUser?.LogoUrl ?? ""
             };
         }
 

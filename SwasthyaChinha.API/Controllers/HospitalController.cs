@@ -28,11 +28,11 @@ namespace SwasthyaChinha.API.Controllers
         public async Task<IActionResult> CreateHospital([FromBody] CreateHospitalDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-                var hospital = new Hospital
-    {
-        Name = dto.Name,
-        Address = dto.Address
-    };
+            var hospital = new Hospital
+            {
+                Name = dto.Name,
+                Address = dto.Address
+            };
 
 
             await _context.Hospitals.AddAsync(hospital);
@@ -61,17 +61,17 @@ namespace SwasthyaChinha.API.Controllers
         //     await _hospitalService.RegisterDoctorAsync(dto);
         //     return Ok("Doctor registered successfully.");
         // }
-      {
-    if (!ModelState.IsValid)
-        return BadRequest(ModelState);  // ✅ This validates the request before continuing
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);  // ✅ This validates the request before continuing
 
-     await _hospitalService.RegisterDoctorAsync(dto); // Make sure _authService is injected
+            await _hospitalService.RegisterDoctorAsync(dto); // Make sure _authService is injected
 
-    // if (!response.IsSuccess)
-    //     return BadRequest(response);    // Optional: send detailed message to frontend
+            // if (!response.IsSuccess)
+            //     return BadRequest(response);    // Optional: send detailed message to frontend
 
-    return Ok(new { message = "Doctor Registered successfully."});
-}
+            return Ok(new { message = "Doctor Registered successfully." });
+        }
 
 
 
@@ -101,5 +101,28 @@ namespace SwasthyaChinha.API.Controllers
             var patients = await _hospitalService.GetAllPatientsAsync();
             return Ok(patients);
         }
+        [Authorize(Roles = "hospitaladmin")]
+[HttpGet("prescriptions")]
+public async Task<IActionResult> GetHospitalPrescriptions([FromQuery] string hospitalId)
+{
+    if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
+        return BadRequest("Invalid hospitalId");
+
+    var prescriptions = await _context.Prescriptions
+        .Include(p => p.Doctor)
+        .Include(p => p.Patient)
+        .Where(p => p.HospitalId == hospitalGuid)
+        .OrderByDescending(p => p.CreatedAt)
+        .Select(p => new {
+            Date = p.CreatedAt,
+            Doctor = p.Doctor.FullName,
+            Patient = p.Patient.FullName,
+            Status = p.IsDispensed ? "Dispensed" : "Active"
+        })
+        .ToListAsync();
+
+    return Ok(prescriptions);
+}
+
     }
 }
