@@ -90,34 +90,34 @@ namespace SwasthyaChinha.API.Controllers
             return Ok(profile);
         }
         [HttpPost("prescribe")]
-public async Task<IActionResult> CreatePrescription(CreatePrescriptionDTO dto)
-{
-    var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-    if (string.IsNullOrEmpty(doctorId))
-        return Unauthorized("Invalid token");
-
-    try
-    {
-        Console.WriteLine($"DoctorId: {doctorId}");
-        Console.WriteLine($"PatientId: {dto?.PatientId}, HospitalId: {dto?.HospitalId}, Medicines: {dto?.Medicines?.Count}");
-
-        var qrCodeBase64 = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
-
-        return Ok(new
+        public async Task<IActionResult> CreatePrescription(CreatePrescriptionDTO dto)
         {
-            message = "Prescription created",
-            qrCode = qrCodeBase64
-        });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error in CreatePrescription: {ex}");
-        return StatusCode(500, new { message = $"Server error: {ex.Message}" });
-    }
-}
+            var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(doctorId))
+                return Unauthorized("Invalid token");
+
+            try
+            {
+                Console.WriteLine($"DoctorId: {doctorId}");
+                Console.WriteLine($"PatientId: {dto?.PatientId}, HospitalId: {dto?.HospitalId}, Medicines: {dto?.Medicines?.Count}");
+
+                var qrCodeBase64 = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
+
+                return Ok(new
+                {
+                    message = "Prescription created",
+                    qrCode = qrCodeBase64
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CreatePrescription: {ex}");
+                return StatusCode(500, new { message = $"Server error: {ex.Message}" });
+            }
+        }
 
 
-//         [HttpPost("prescribe")]
+        //         [HttpPost("prescribe")]
         //         public async Task<IActionResult> CreatePrescription(CreatePrescriptionDTO dto)
         //         {
         //             var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -166,16 +166,31 @@ public async Task<IActionResult> CreatePrescription(CreatePrescriptionDTO dto)
             return Ok(stats);
         }
 
-[Authorize(Roles = "doctor")]
-[HttpGet("search-patients")]
-public async Task<IActionResult> SearchPatients([FromQuery] string query)
-{
-    if (string.IsNullOrWhiteSpace(query))
-        return BadRequest("Query is required");
+        [Authorize(Roles = "doctor")]
+        [HttpGet("search-patients")]
+        public async Task<IActionResult> SearchPatients([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return BadRequest("Query is required");
 
-    var results = await _doctorService.SearchPatientsAsync(query);
-    return Ok(results);
+            var results = await _doctorService.SearchPatientsAsync(query);
+            return Ok(results);
+        }
+        
+        [HttpGet("total-patients")]
+public async Task<IActionResult> GetTotalRegisteredPatients()
+{
+    try
+    {
+        var totalPatients = await _doctorService.GetTotalRegisteredPatientsAsync();
+        return Ok(new { count = totalPatients });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = $"Server error: {ex.Message}" });
+    }
 }
+
 
 
     }

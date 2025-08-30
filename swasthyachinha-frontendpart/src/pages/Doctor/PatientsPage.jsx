@@ -17,7 +17,7 @@ const PatientsPage = () => {
       ) : (
         <ul className="space-y-2">
           {patients.map((p) => (
-            <li key={p._id} className="p-3 bg-white shadow rounded">
+            <li key={p.Id} className="p-3 bg-white shadow rounded">
               <p className="font-semibold">{p.fullName}</p>
               <p className="text-gray-600">{p.email}</p>
             </li>
