@@ -543,7 +543,7 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import Sidebar from "../../components/dashboard/Sidebar";
-
+import { getHospitalStats, getHospitalPrescriptions } from "../../services/hospitalService";
 const DoctorDashboard = () => {
   const [doctor, setDoctor] = useState({});
   const [stats, setStats] = useState({ patientsToday: 0, prescriptionsGiven: 0 });
@@ -567,6 +567,7 @@ const DoctorDashboard = () => {
     api.get("/doctor/total-patients").then(res => setTotalPatients(res.data.count));
 
   }, []);
+  
 
   return (
     <div className="flex h-screen bg-gray-100">
