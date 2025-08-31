@@ -17,9 +17,13 @@ export const updateHospitalProfile = (hospitalId, data) =>
   api.put(`/hospital/${hospitalId}`, data);
 
 // ✅ Get Hospital Doctors
-export const getDoctors = (hospitalId) =>
-  api.get(`/hospital/${hospitalId}/doctors`);
+// export const getDoctors = (hospitalId) =>
+//   api.get(`/hospital/${hospitalId}/doctors`);
 
-// ✅ Get Hospital Patients
-export const getPatients = (hospitalId) =>
-  api.get(`/hospital/${hospitalId}/patients`);
+// // ✅ Get Hospital Patients
+// export const getPatients = (hospitalId) =>
+//   api.get(`/hospital/${hospitalId}/patients`);
+export const getDoctors = () => api.get(`/hospital/doctors`);
+
+// Get Hospital Patients ✅ (fixed)
+export const getPatients = () => api.get(`/hospital/patients`);
