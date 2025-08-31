@@ -1692,6 +1692,7 @@ namespace SwasthyaChinha.API.Services
                 DoctorName = p.Doctor?.FullName ?? "N/A",
                 HospitalName = p.Hospital?.Name ?? "N/A",
                 DateIssued = p.CreatedAt,
+                Diagnosis=p.Diagnosis,
                 Medicines = p.Items.Select(i => new MedicineDTO
                 {
                     Name = i.MedicineName,
