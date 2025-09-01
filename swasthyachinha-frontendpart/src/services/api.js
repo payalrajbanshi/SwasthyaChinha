@@ -3,7 +3,7 @@ import axios from "axios";
 // Axios instance
 const API = axios.create({
    baseURL: "http://localhost:5099/api", // backend URL
-  //baseURL: " https://radiation-quantity-retention-abc.trycloudflare.com ",
+  //baseURL: "http://192.168.1.69:5099/api",
   headers: {
     "Content-Type": "application/json",
   },

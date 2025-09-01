@@ -903,10 +903,10 @@ export default function Dashboard() {
   if (!profile) return <div>Loading...</div>;
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 pb-16 space-y-4">
       <TopNav profile={profile} />
 
-      <div className="flex h-[75vh] gap-4">
+      <div className="flex flex-col md:flex-row  md:h-[75vh] gap-4">
         <PrescriptionFeed />
       </div>
 

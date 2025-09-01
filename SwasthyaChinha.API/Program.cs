@@ -371,11 +371,27 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5173","http://localhost:5099" )
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5099")
               .AllowAnyHeader()
               .AllowAnyMethod();
+              //.AllowCredentials();
     });
 });
+// 🔹 4. CORS for frontend + Cloudflare tunnel
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("ReactPolicy", policy =>
+//     {
+//         policy.WithOrigins(
+//             "http://localhost:5173",                  // Local React
+//             "https://architects-list-connections-verbal.trycloudflare.com"      // Cloudflared tunnel frontend
+//         )
+//         .AllowAnyHeader()
+//         .AllowAnyMethod()
+//         .AllowCredentials();
+//     });
+// });
+
 
 // 🔹 5. Custom Services
 builder.Services.AddScoped<IAuthService, AuthService>();
