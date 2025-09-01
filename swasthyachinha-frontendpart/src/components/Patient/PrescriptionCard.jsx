@@ -39,6 +39,22 @@
 //     </div>
 //   );
 // }
+// import React from "react";
+// import { Link } from "react-router-dom";
+
+// export default function PrescriptionCard({ prescription }) {
+//   return (
+//     <div className="border-b border-gray-200 py-2 flex justify-between">
+//       <div>
+//         <p className="font-medium">{prescription.doctorName}</p>
+//         <p className="text-sm text-gray-500">{new Date(prescription.dateIssued).toLocaleDateString()}</p>
+//       </div>
+//       <Link to={`/patient/prescription/${prescription.prescriptionId}`} className="text-green-600 underline">
+//         View
+//       </Link>
+//     </div>
+//   );
+// }
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -46,10 +62,36 @@ export default function PrescriptionCard({ prescription }) {
   return (
     <div className="border-b border-gray-200 py-2 flex justify-between">
       <div>
+        {/* Doctor Name */}
         <p className="font-medium">{prescription.doctorName}</p>
-        <p className="text-sm text-gray-500">{new Date(prescription.dateIssued).toLocaleDateString()}</p>
+
+        {/* Doctor Specialty */}
+        {prescription.specialty && (
+          <p className="text-sm text-gray-500">{prescription.specialty}</p>
+        )}
+
+        {/* Diagnosis */}
+        {prescription.diagnosis && (
+          <p className="text-sm text-gray-700 mt-1">{prescription.diagnosis}</p>
+        )}
+
+        {/* Date Issued */}
+        <p className="text-sm text-gray-500">
+          {new Date(prescription.dateIssued).toLocaleDateString()}
+        </p>
+
+        {/* Medicines List */}
+        {prescription.medicines?.map((med, idx) => (
+          <p key={idx} className="text-sm text-gray-700">
+            {med.name} - {med.dosage}
+          </p>
+        ))}
       </div>
-      <Link to={`/patient/prescription/${prescription.prescriptionId}`} className="text-green-600 underline">
+
+      <Link
+        to={`/patient/prescription/${prescription.prescriptionId}`}
+        className="text-green-600 underline"
+      >
         View
       </Link>
     </div>

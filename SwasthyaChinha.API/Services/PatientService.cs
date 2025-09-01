@@ -1684,12 +1684,14 @@ namespace SwasthyaChinha.API.Services
                 .Include(p => p.Items)
                 .Include(p => p.Patient)
                     .ThenInclude(pt => pt.User)
+                    .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
 
             return prescriptions.Select(p => new PatientPrescriptionDTO
             {
                 PrescriptionId = p.Id.ToString(),
                 DoctorName = p.Doctor?.FullName ?? "N/A",
+                DoctorSpecialty = p.Doctor?.Specialty ?? "N/A",
                 HospitalName = p.Hospital?.Name ?? "N/A",
                 DateIssued = p.CreatedAt,
                 Diagnosis=p.Diagnosis,
