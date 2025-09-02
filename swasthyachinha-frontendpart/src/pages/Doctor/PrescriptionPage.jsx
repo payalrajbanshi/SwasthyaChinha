@@ -3339,3 +3339,193 @@ const PrescriptionPage = () => {
 };
 
 export default PrescriptionPage;
+
+// import React, { useEffect, useState, useRef } from "react";
+// import Sidebar from "../../components/dashboard/Sidebar";
+// import api from "../../services/api";
+// import { createPrescription, getDoctorProfile } from "../../services/doctorService";
+// import * as jwt_decode from "jwt-decode";
+
+// const BACKEND_URL = "http://localhost:5099";
+
+// const PrescriptionPage = () => {
+//   const [loading, setLoading] = useState(true);
+//   const [doctorInfo, setDoctorInfo] = useState({});
+//   const [formData, setFormData] = useState({
+//     patientId: "",
+//     hospitalId: "",
+//     diagnosis: "",
+//     medicines: [{ name: "", dosage: "" }]
+//   });
+//   const [qrCode, setQrCode] = useState(null);
+//   const [successMsg, setSuccessMsg] = useState("");
+
+//   // Patient search
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [searchResults, setSearchResults] = useState([]);
+//   const [selectedPatient, setSelectedPatient] = useState(null);
+//   const searchTimeout = useRef(null);
+
+//   // Medicine suggestions
+//   const [medicineSuggestions, setMedicineSuggestions] = useState([]);
+
+//   // Fetch doctor profile once
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       try {
+//         const profile = await getDoctorProfile();
+//         let hospitalId = profile.hospitalId;
+
+//         if (!hospitalId) {
+//           const token = localStorage.getItem("token");
+//           if (token) {
+//             const decoded = jwt_decode.default(token);
+//             hospitalId = decoded["hospitalId"] || "";
+//           }
+//         }
+
+//         setDoctorInfo(profile);
+//         setFormData(prev => ({ ...prev, hospitalId: hospitalId || "" }));
+//       } catch (err) {
+//         console.error("Error fetching profile:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProfile();
+//   }, []);
+
+//   // Debounced patient search
+//   const handleSearch = (value) => {
+//     setSearchQuery(value);
+//     setSelectedPatient(null);
+
+//     if (searchTimeout.current) clearTimeout(searchTimeout.current);
+//     if (value.trim().length < 2) {
+//       setSearchResults([]);
+//       return;
+//     }
+
+//     searchTimeout.current = setTimeout(async () => {
+//       try {
+//         const res = await api.get(`/doctor/search-patients?query=${value}`);
+//         setSearchResults(Array.isArray(res.data) ? res.data : []);
+//       } catch (err) {
+//         console.error(err);
+//         setSearchResults([]);
+//       }
+//     }, 500);
+//   };
+
+//   const selectPatient = (patient) => {
+//     setSelectedPatient(patient);
+//     setSearchQuery(patient.name);
+//     setFormData(prev => ({ ...prev, patientId: patient.id }));
+//     setSearchResults([]);
+//   };
+
+//   const handleMedicineChange = (index, field, value) => {
+//     const updated = [...formData.medicines];
+//     updated[index][field] = value;
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   const addMedicine = () => {
+//     setFormData(prev => ({
+//       ...prev,
+//       medicines: [...prev.medicines, { name: "", dosage: "" }]
+//     }));
+//   };
+
+//   const removeMedicine = (index) => {
+//     setFormData(prev => ({
+//       ...prev,
+//       medicines: prev.medicines.filter((_, i) => i !== index)
+//     }));
+//   };
+
+//   const fetchMedicineSuggestions = async (query, index) => {
+//     if (query.length < 2) return setMedicineSuggestions(prev => ({ ...prev, [index]: [] }));
+
+//     try {
+//       const res = await fetch("http://127.0.0.1:5000/autocomplete", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ text: query })
+//       });
+//       const data = await res.json();
+//       setMedicineSuggestions(prev => ({ ...prev, [index]: data.suggestions || [] }));
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setSuccessMsg("");
+//     setQrCode(null);
+
+//     try {
+//       const res = await createPrescription(formData);
+//       if (res.qrCode) {
+//         setQrCode(res.qrCode);
+//         setSuccessMsg("✅ Prescription sent successfully!");
+//       }
+//     } catch (err) {
+//       console.error(err);
+//       alert("❌ Failed to create prescription");
+//     }
+//   };
+
+//   if (loading) return <div className="p-6">⏳ Loading prescription page...</div>;
+
+//   const profileImage = doctorInfo.profileImageUrl
+//     ? doctorInfo.profileImageUrl.startsWith("http")
+//       ? doctorInfo.profileImageUrl
+//       : `${BACKEND_URL}${doctorInfo.profileImageUrl}?t=${Date.now()}`
+//     : "/default-doctor.png";
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       <Sidebar doctor={doctorInfo} />
+
+//       <div className="flex-1 p-6">
+//         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
+//           {/* Hospital Info */}
+//           <div className="text-center border-b pb-3">
+//             <h1 className="text-2xl font-bold">{doctorInfo.hospitalName}</h1>
+//             <p className="text-gray-600">{doctorInfo.hospitalAddress}</p>
+//           </div>
+
+//           {/* Doctor Info */}
+//           <div className="flex justify-between mt-4 border-b pb-3">
+//             <div>
+//               <p className="font-semibold">{doctorInfo.fullName}</p>
+//               <p className="text-gray-600">{doctorInfo.specialty}</p>
+//             </div>
+//             {doctorInfo.signatureUrl && (
+//               <img
+//                 src={doctorInfo.signatureUrl.startsWith("http") ? doctorInfo.signatureUrl : `${BACKEND_URL}${doctorInfo.signatureUrl}?t=${Date.now()}`}
+//                 alt="Doctor Signature"
+//                 className="h-12"
+//               />
+//             )}
+//           </div>
+
+//           {/* Prescription Form */}
+//           {/* ... keep your form JSX as-is ... */}
+
+//           {/* QR Code */}
+//           {qrCode && (
+//             <div className="mt-6 text-center">
+//               <img src={`data:image/png;base64,${qrCode}`} alt="Prescription QR" className="mx-auto w-40 h-40" />
+//               <p className="mt-2 text-green-600">{successMsg}</p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PrescriptionPage;
