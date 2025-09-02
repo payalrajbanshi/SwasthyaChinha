@@ -23,29 +23,103 @@ namespace SwasthyaChinha.API.Controllers
         }
 
         //✅ Create Prescription (Doctor handles QR generation)
+        // [HttpPost("prescribe")]
+        // public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionDTO model)
+        // {
+        //     if (model == null || model.Medicines == null || model.Medicines.Count == 0)
+        //         return BadRequest("Invalid prescription data.");
+
+        //     string doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //     try
+        //     {
+        //         var qrBase64 = await _doctorService.CreatePrescriptionAsync(model, doctorId);
+
+        //         return Ok(new
+        //         {
+        //             message = "Prescription created successfully",
+        //             qrCode = qrBase64
+        //         });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, ex.Message);
+        //     }
+        // }
+        //         [HttpPost("prescribe")]
+        // public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionDTO model)
+        // {
+        //     if (model == null || model.Medicines == null || model.Medicines.Count == 0)
+        //         return BadRequest("Invalid prescription data.");
+
+        //     string doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //     try
+        //     {
+        //         var prescription = new Prescription
+        //         {
+        //             //prescription.PatientId = Guid.Parse(model.PatientId),
+        //             prescription.PatientId = Guid.Parse(model.PatientId),
+        //             HospitalId = model.HospitalId,
+        //             Diagnosis = model.Diagnosis,
+        //             Items = model.Medicines.Select(m => new PrescriptionItem
+        //             {
+        //                 MedicineName = m.Name,
+        //                 Dosage = m.Dosage
+        //             }).ToList()
+        //         };
+
+        //         var result = await _doctorService.CreatePrescriptionAsync(prescription, model.ManualQRId);
+
+        //         return Ok(new
+        //         {
+        //             message = "Prescription created successfully",
+        //             qrCode = result.QRCode,
+        //             qrData = result.QRCodeData // send the manual QR or auto QR
+        //         });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, ex.Message);
+        //     }
+        // }
         [HttpPost("prescribe")]
-        public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionDTO model)
+public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionDTO model)
+{
+    if (model == null || model.Medicines == null || model.Medicines.Count == 0)
+        return BadRequest("Invalid prescription data.");
+
+    string doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    try
+    {
+        var prescription = new Prescription
         {
-            if (model == null || model.Medicines == null || model.Medicines.Count == 0)
-                return BadRequest("Invalid prescription data.");
-
-            string doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            try
+            PatientId = Guid.Parse(model.PatientId),
+            DoctorId = Guid.Parse(doctorId),
+            HospitalId = Guid.Parse(model.HospitalId),
+            Diagnosis = model.Diagnosis,
+            Items = model.Medicines.Select(m => new PrescriptionItem
             {
-                var qrBase64 = await _doctorService.CreatePrescriptionAsync(model, doctorId);
+                MedicineName = m.Name,
+                Dosage = m.Dosage
+            }).ToList()
+        };
 
-                return Ok(new
-                {
-                    message = "Prescription created successfully",
-                    qrCode = qrBase64
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
+        var result = await _prescriptionService.CreatePrescriptionAsync(prescription, model.ManualQRId);
+
+        return Ok(new
+        {
+            message = "Prescription created successfully",
+            qrCode = result.QRCode,
+            qrData = result.QRCodeData
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, ex.Message);
+    }
+}
 
         // ✅ Get Prescription by ID
         [HttpGet("{id}")]

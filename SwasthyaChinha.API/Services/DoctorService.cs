@@ -146,54 +146,108 @@ namespace SwasthyaChinha.API.Services
         // }
 
 
-    
-        public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
+
+        // public async Task<string> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
+        // {
+        //     // Validate GUIDs
+        //     if (!Guid.TryParse(doctorId, out var doctorGuid))
+        //         throw new UnauthorizedAccessException("Invalid doctor token");
+
+        //     if (!Guid.TryParse(dto.PatientId, out var patientGuid))
+        //         throw new ArgumentException("Invalid PatientId GUID format");
+
+        //     if (!Guid.TryParse(dto.HospitalId, out var hospitalGuid))
+        //         throw new ArgumentException("Invalid HospitalId GUID format");
+
+        //     // Create prescription entity
+        //     var prescription = new Prescription
+        //     {
+        //         DoctorId = doctorGuid,
+        //         PatientId = patientGuid,
+        //         HospitalId = hospitalGuid,
+        //         CreatedAt = DateTime.UtcNow,
+        //         Diagnosis = dto.Diagnosis,
+        //         IsDispensed = false,
+        //         Items = dto.Medicines.Select(m => new PrescriptionItem
+        //         {
+        //             MedicineName = m.Name,
+        //             Dosage = m.Dosage,
+        //             Cost = 0
+        //         }).ToList(),
+        //         TotalCost = 0,
+        //         QRCode = "TEMP"  // temporary placeholder to satisfy NOT NULL column
+        //     };
+
+        //     // Add and save to get the database-generated Id
+        //     _context.Prescriptions.Add(prescription);
+        //     await _context.SaveChangesAsync();
+
+
+        //     // Now generate QR code with actual prescription.Id
+        //     var qrService = new QRService();
+        //     var qrData = prescription.Id.ToString();
+        //     //var qrData = $"PRESC-{prescription.Id}";
+        //     var qrCodeBase64 = qrService.GenerateQRCode(qrData);
+
+        //     // Update the prescription with the real QR
+        //     prescription.QRCodeData = qrData; //store the id
+        //     prescription.QRCode = qrCodeBase64;
+        //     await _context.SaveChangesAsync();
+
+        //     return new PrescriptionQRCodeDTO
+        //     {
+        //         QRCode = qrCodeBase64,
+        //         QRCodeData = qrData
+        //     };
+        // }
+        public async Task<PrescriptionQRDTO> CreatePrescriptionAsync(CreatePrescriptionDTO dto, string doctorId)
+{
+    if (!Guid.TryParse(doctorId, out var doctorGuid))
+        throw new UnauthorizedAccessException("Invalid doctor token");
+
+    if (!Guid.TryParse(dto.PatientId, out var patientGuid))
+        throw new ArgumentException("Invalid PatientId GUID format");
+
+    if (!Guid.TryParse(dto.HospitalId, out var hospitalGuid))
+        throw new ArgumentException("Invalid HospitalId GUID format");
+
+    var prescription = new Prescription
+    {
+        DoctorId = doctorGuid,
+        PatientId = patientGuid,
+        HospitalId = hospitalGuid,
+        CreatedAt = DateTime.UtcNow,
+        Diagnosis = dto.Diagnosis,
+        IsDispensed = false,
+        Items = dto.Medicines.Select(m => new PrescriptionItem
         {
-            // Validate GUIDs
-            if (!Guid.TryParse(doctorId, out var doctorGuid))
-                throw new UnauthorizedAccessException("Invalid doctor token");
+            MedicineName = m.Name,
+            Dosage = m.Dosage,
+            Cost = 0
+        }).ToList(),
+        TotalCost = 0,
+        QRCode = "TEMP" // placeholder
+    };
 
-            if (!Guid.TryParse(dto.PatientId, out var patientGuid))
-                throw new ArgumentException("Invalid PatientId GUID format");
+    _context.Prescriptions.Add(prescription);
+    await _context.SaveChangesAsync();
 
-            if (!Guid.TryParse(dto.HospitalId, out var hospitalGuid))
-                throw new ArgumentException("Invalid HospitalId GUID format");
+    // Generate QR code
+    var qrService = new QRService();
+    var qrData = prescription.Id.ToString();
+    var qrCodeBase64 = qrService.GenerateQRCode(qrData);
 
-            // Create prescription entity
-            var prescription = new Prescription
-            {
-                DoctorId = doctorGuid,
-                PatientId = patientGuid,
-                HospitalId = hospitalGuid,
-                CreatedAt = DateTime.UtcNow,
-                Diagnosis = dto.Diagnosis,
-                IsDispensed = false,
-                Items = dto.Medicines.Select(m => new PrescriptionItem
-                {
-                    MedicineName = m.Name,
-                    Dosage = m.Dosage,
-                    Cost = 0
-                }).ToList(),
-                TotalCost = 0,
-                QRCode = "TEMP"  // temporary placeholder to satisfy NOT NULL column
-            };
+    prescription.QRCodeData = qrData;
+    prescription.QRCode = qrCodeBase64;
+    await _context.SaveChangesAsync();
 
-            // Add and save to get the database-generated Id
-            _context.Prescriptions.Add(prescription);
-            await _context.SaveChangesAsync();
-
-            // Now generate QR code with actual prescription.Id
-            var qrService = new QRService();
-            var qrData = $"PRESC-{prescription.Id}";
-            var qrCodeBase64 = qrService.GenerateQRCode(qrData);
-
-            // Update the prescription with the real QR
-            prescription.QRCodeData = qrData;
-            prescription.QRCode = qrCodeBase64;
-            await _context.SaveChangesAsync();
-
-            return qrCodeBase64;
-        }
+    // ✅ Return DTO with both values
+    return new PrescriptionQRDTO
+    {
+        QRCode = qrCodeBase64,
+        QRCodeData = qrData
+    };
+}
 
         public async Task<List<DoctorPatientDTO>> GetPatientsAsync(string doctorId)
         {
@@ -216,6 +270,103 @@ namespace SwasthyaChinha.API.Services
                 .Distinct()
                 .ToListAsync();
         }
+        // public async Task<DoctorProfileDTO> UpdateProfileAsync(UpdateDoctorProfileDTO dto, string doctorId)
+        // {
+        //     if (!Guid.TryParse(doctorId, out var doctorGuid))
+        //         throw new Exception("Invalid doctor ID");
+
+        //     var doctor = await _context.Users
+        //         .FirstOrDefaultAsync(u => u.Id == doctorGuid && u.Role == "Doctor");
+
+        //     if (doctor == null)
+        //         throw new Exception("Doctor not found");
+
+        //     doctor.FullName = dto.FullName;
+        //     doctor.Specialty = dto.Specialty;
+
+        //     if (dto.ProfilePicture != null)
+        //     {
+        //         // Save file to wwwroot/uploads or any folder
+        //         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        //         if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+        //         var uniqueFileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
+        //         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        //         using (var stream = new FileStream(filePath, FileMode.Create))
+        //         {
+        //             await dto.ProfilePicture.CopyToAsync(stream);
+        //         }
+
+        //         // Store relative URL
+        //         doctor.ProfileImageUrl = $"/uploads/{uniqueFileName}";
+        //     }
+
+        //     await _context.SaveChangesAsync();
+
+        //     // Return updated DTO
+        //     return new DoctorProfileDTO
+        //     {
+        //         Id = doctor.Id.ToString(),
+        //         FullName = doctor.FullName,
+        //         Email = doctor.Email,
+        //         Specialty = doctor.Specialty,
+        //         ProfileImageUrl = $"/uploads/{uniqueFileName}",
+        //         HospitalId = doctor.HospitalId ?? Guid.Empty,
+        //         HospitalName = doctor.Hospital?.Name,
+        //         HospitalAddress = doctor.Hospital?.Address,
+        //         SignatureUrl = doctor.SignatureUrl
+        //     };
+        // }
+public async Task<DoctorProfileDTO> UpdateProfileAsync(UpdateDoctorProfileDTO dto, string doctorId)
+{
+    if (!Guid.TryParse(doctorId, out var doctorGuid))
+        throw new Exception("Invalid doctor ID");
+
+    var doctor = await _context.Users
+        .FirstOrDefaultAsync(u => u.Id == doctorGuid && u.Role == "Doctor");
+
+    if (doctor == null)
+        throw new Exception("Doctor not found");
+
+    doctor.FullName = dto.FullName;
+    doctor.Specialty = dto.Specialty;
+
+    string profileUrl = doctor.ProfileImageUrl; // default to existing URL
+
+    if (dto.ProfilePicture != null)
+    {
+        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+        var uniqueFileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await dto.ProfilePicture.CopyToAsync(stream);
+        }
+
+        profileUrl = $"/uploads/{uniqueFileName}";
+        doctor.ProfileImageUrl = profileUrl;
+    }
+
+    await _context.SaveChangesAsync();
+
+    return new DoctorProfileDTO
+    {
+        Id = doctor.Id.ToString(),
+        FullName = doctor.FullName,
+        Email = doctor.Email,
+        Specialty = doctor.Specialty,
+        ProfileImageUrl = profileUrl,  // safe, always defined
+        HospitalId = doctor.HospitalId ?? Guid.Empty,
+        HospitalName = doctor.Hospital?.Name,
+        HospitalAddress = doctor.Hospital?.Address,
+        SignatureUrl = doctor.SignatureUrl
+    };
+}
+
 
 
         public async Task<IEnumerable<PatientSearchResultDTO>> SearchPatientsAsync(string query)

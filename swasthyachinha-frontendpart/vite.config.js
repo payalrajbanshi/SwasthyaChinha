@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react() , tailwindcss()],
   server: {
+    //https: true,
     host: true, // allow network access
     port: 5173, // your dev server port
     allowedHosts: ['.trycloudflare.com'] // allow Cloudflare Tunnel

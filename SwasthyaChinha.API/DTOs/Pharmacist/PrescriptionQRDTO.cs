@@ -3,7 +3,7 @@ using SwasthyaChinha.API.DTOs.Doctor;
 namespace SwasthyaChinha.API.DTOs.Pharmacist
 {
     public class PrescriptionQRDTO
-    {
+    { 
         public string PrescriptionId { get; set; }
         public string PatientName { get; set; }
         public string DoctorName { get; set; }

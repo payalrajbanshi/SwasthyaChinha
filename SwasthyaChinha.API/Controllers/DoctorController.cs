@@ -89,32 +89,115 @@ namespace SwasthyaChinha.API.Controllers
             var profile = await _doctorService.GetProfileAsync(doctorId);
             return Ok(profile);
         }
-        [HttpPost("prescribe")]
-        public async Task<IActionResult> CreatePrescription(CreatePrescriptionDTO dto)
+            [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromForm] UpdateDoctorProfileDTO dto)
+    {
+        var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(doctorId))
+            return Unauthorized("Invalid token");
+
+        try
         {
-            var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(doctorId))
-                return Unauthorized("Invalid token");
-
-            try
-            {
-                Console.WriteLine($"DoctorId: {doctorId}");
-                Console.WriteLine($"PatientId: {dto?.PatientId}, HospitalId: {dto?.HospitalId}, Medicines: {dto?.Medicines?.Count}");
-
-                var qrCodeBase64 = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
-
-                return Ok(new
-                {
-                    message = "Prescription created",
-                    qrCode = qrCodeBase64
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in CreatePrescription: {ex}");
-                return StatusCode(500, new { message = $"Server error: {ex.Message}" });
-            }
+            var updatedDoctor = await _doctorService.UpdateProfileAsync(dto, doctorId);
+            return Ok(updatedDoctor);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Server error: {ex.Message}" });
+        }
+    }
+
+        // [HttpPost("prescribe")]
+        // public async Task<IActionResult> CreatePrescription(CreatePrescriptionDTO dto)
+        // {
+        //     var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //     if (string.IsNullOrEmpty(doctorId))
+        //         return Unauthorized("Invalid token");
+
+        //     try
+        //     {
+        //         Console.WriteLine($"DoctorId: {doctorId}");
+        //         Console.WriteLine($"PatientId: {dto?.PatientId}, HospitalId: {dto?.HospitalId}, Medicines: {dto?.Medicines?.Count}");
+
+        //         var qrCodeBase64 = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
+
+        //         return Ok(new
+        //         {
+        //             message = "Prescription created",
+        //             qrCode = qrCodeBase64
+        //         });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Console.WriteLine($"Error in CreatePrescription: {ex}");
+        //         return StatusCode(500, new { message = $"Server error: {ex.Message}" });
+        //     }
+        // }
+        //         [HttpPost("prescribe")]
+        // public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionDTO dto)
+        // {
+        //     var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //     if (string.IsNullOrEmpty(doctorId))
+        //         return Unauthorized("Invalid token");
+
+        //     try
+        //     {
+        //         // Call service to create prescription and get both QR image and QR ID
+        //         var (qrCodeImage, qrCodeData) = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
+
+        //         return Ok(new
+        //         {
+        //             success = true,
+        //             qrCode = qrCodeImage,  // base64 image for QR
+        //             qrCodeData = qrCodeData // prescription ID fallback
+        //         });
+        //     }
+        //     catch (ArgumentException ex)
+        //     {
+        //         return BadRequest(new { message = ex.Message });
+        //     }
+        //     catch (UnauthorizedAccessException ex)
+        //     {
+        //         return Unauthorized(new { message = ex.Message });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return StatusCode(500, new { message = $"Server error: {ex.Message}" });
+        //     }
+        // 
+        [HttpPost("prescribe")]
+public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionDTO dto)
+{
+    // Get doctorId from JWT token
+    var doctorId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(doctorId))
+        return Unauthorized("Invalid token");
+
+    try
+    {
+        // Call service to create prescription and get both QR image and QR ID
+        var qrResult = await _doctorService.CreatePrescriptionAsync(dto, doctorId);
+
+        return Ok(new
+        {
+            success = true,
+            qrCode = qrResult.QRCode,        // Base64 QR image
+            qrCodeData = qrResult.QRCodeData // Prescription ID fallback
+        });
+    }
+    catch (ArgumentException ex)
+    {
+        return BadRequest(new { message = ex.Message });
+    }
+    catch (UnauthorizedAccessException ex)
+    {
+        return Unauthorized(new { message = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = $"Server error: {ex.Message}" });
+    }
+}
 
 
         //         [HttpPost("prescribe")]

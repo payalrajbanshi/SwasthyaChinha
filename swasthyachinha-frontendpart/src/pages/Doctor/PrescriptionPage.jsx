@@ -3149,6 +3149,7 @@ const PrescriptionPage = () => {
 
     try {
       const res = await createPrescription(formData);
+      const qr = res.qrCode || formData.manualQRId;
       if (res.qrCode) {
         setQrCode(res.qrCode);
         setSuccessMsg("✅ Prescription sent successfully!");
@@ -3242,6 +3243,20 @@ const PrescriptionPage = () => {
                 className="border rounded p-2 w-full"
               />
             </div>
+            {/* Manual QR ID */}
+<div className="mb-4">
+  <label className="block font-medium mb-1">Manual QR ID (optional)</label>
+  <input
+    type="text"
+    placeholder="Enter manual QR ID if any"
+    value={formData.manualQRId || ""}
+    onChange={(e) =>
+      setFormData({ ...formData, manualQRId: e.target.value })
+    }
+    className="border rounded p-2 w-full"
+  />
+</div>
+
 
             {/* Medicines */}
             <div className="mb-4">

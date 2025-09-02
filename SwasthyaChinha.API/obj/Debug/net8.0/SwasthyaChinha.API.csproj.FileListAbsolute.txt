@@ -277,3 +277,4 @@ C:\Users\Acer\OneDrive\Desktop\SwasthyaChinha\SwasthyaChinha.API\obj\Debug\net8.
 C:\Users\Acer\OneDrive\Desktop\SwasthyaChinha\SwasthyaChinha.API\obj\Debug\net8.0\SwasthyaChinha.API.pdb
 C:\Users\Acer\OneDrive\Desktop\SwasthyaChinha\SwasthyaChinha.API\obj\Debug\net8.0\SwasthyaChinha.API.genruntimeconfig.cache
 C:\Users\Acer\OneDrive\Desktop\SwasthyaChinha\SwasthyaChinha.API\obj\Debug\net8.0\ref\SwasthyaChinha.API.dll
+C:\Users\Acer\OneDrive\Desktop\SwasthyaChinha\SwasthyaChinha.API\bin\Debug\net8.0\SwasthyaChinha.API.staticwebassets.runtime.json

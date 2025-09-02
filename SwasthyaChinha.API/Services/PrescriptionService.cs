@@ -183,21 +183,233 @@
 // }
 
 
+// using Microsoft.EntityFrameworkCore;
+// using SwasthyaChinha.API.Data;
+// using SwasthyaChinha.API.Models;
+// using SwasthyaChinha.API.Services.Interfaces;
+// using SwasthyaChinha.API.DTOs.Pharmacist;
+// using SwasthyaChinha.API.DTOs.Doctor;
+// using SwasthyaChinha.API.DTOs.Patient;
+// using QRCoder;
+// using System.Drawing;
+// using System.Drawing.Imaging;
+// using System.IO;
+// using System.Linq;
+// using System.Threading.Tasks;
+// using System;
+// using System.Collections.Generic;
+
+// namespace SwasthyaChinha.API.Services
+// {
+//     public class PrescriptionService : IPrescriptionService
+//     // {
+//     //     private readonly ApplicationDbContext _context;
+
+//     //     public PrescriptionService(ApplicationDbContext context)
+//     //     {
+//     //         _context = context;
+//     //     }
+
+//     //     // Create new prescription with QR generation
+//     //     public async Task<Prescription> CreatePrescriptionAsync(Prescription prescription)
+//     //     {
+//     //         _context.Prescriptions.Add(prescription);
+//     //         await _context.SaveChangesAsync();
+
+//     //         // Generate QR Code content
+//     //         string qrContent = manualQrId ?? $"PRESC-{prescription.Id}";
+//     //         prescription.QRCodeData = qrContent;
+
+//     //         // Generate Base64 QR image
+//     //         using (var qrGenerator = new QRCodeGenerator())
+//     //         {
+//     //             var qrData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
+//     //             var pngQrCode = new PngByteQRCode(qrData);
+//     //             byte[] qrCodeBytes = pngQrCode.GetGraphic(20);
+//     //             prescription.QRCode = Convert.ToBase64String(qrCodeBytes);
+//     //         }
+
+//     //         await _context.SaveChangesAsync();
+//     //         return prescription;
+//     //     }
+
+//     //     // Get prescription by ID
+//     //     public async Task<Prescription?> GetPrescriptionByIdAsync(int id)
+//     //     {
+//     //         return await _context.Prescriptions
+//     //             .Include(p => p.Items)
+//     //             .Include(p => p.Doctor)
+//     //             .Include(p => p.Hospital)
+//     //             .Include(p => p.Patient)
+//     //             .FirstOrDefaultAsync(p => p.Id == id);
+//     //     }
+
+//     //     // Get all prescriptions
+//     //     public async Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync()
+//     //     {
+//     //         return await _context.Prescriptions
+//     //             .Include(p => p.Items)
+//     //             .Include(p => p.Doctor)
+//     //             .Include(p => p.Hospital)
+//     //             .Include(p => p.Patient)
+//     //             .ToListAsync();
+//     //     }
+
+//     //     // Get prescription by QR code (works for old and new)
+//     //     public async Task<PrescriptionQRDTO> GetByQRCodeAsync(string qrCodeData)
+//     //     {
+//     //         var prescription = await _context.Prescriptions
+//     //             .Include(p => p.Items)
+//     //             .Include(p => p.Doctor)
+//     //             .Include(p => p.Hospital)
+//     //             .Include(p => p.Patient)
+//     //             .FirstOrDefaultAsync(p => p.QRCodeData == qrCodeData || p.QRCode == qrCodeData);
+
+//     //         if (prescription == null)
+//     //             throw new Exception("Prescription not found.");
+
+//     //         return new PrescriptionQRDTO
+//     //         {
+//     //             PrescriptionId = prescription.Id.ToString(),
+//     //             PatientName = prescription.Patient?.FullName ?? "Unknown",
+//     //             DoctorName = prescription.Doctor?.FullName ?? "Unknown",
+//     //             HospitalName = prescription.Hospital?.Name ?? "Unknown",
+//     //             Medicines = prescription.Items.Select(m => new MedicineDTO
+//     //             {
+//     //                 Name = m.MedicineName,
+//     //                 Dosage = m.Dosage,
+//     //                 Price = m.Cost
+//     //             }).ToList(),
+//     //             IsDispensed = prescription.IsDispensed,
+//     //             QRCodeData = prescription.QRCodeData ?? prescription.QRCode
+//     //         };
+//     //     }
+
+//     //     // Mark prescription as dispensed
+//     //     public async Task<bool> MarkAsDispensedAsync(string prescriptionId)
+//     //     {
+//     //         if (!int.TryParse(prescriptionId, out int id)) return false;
+
+//     //         var prescription = await _context.Prescriptions.FindAsync(id);
+//     //         if (prescription == null) return false;
+
+//     //         prescription.IsDispensed = true;
+//     //         _context.Prescriptions.Update(prescription);
+//     //         await _context.SaveChangesAsync();
+
+//     //         return true;
+//     //     }
+//     // }
+//     //public class PrescriptionService : IPrescriptionService
+// {
+//     private readonly ApplicationDbContext _context;
+
+//     public PrescriptionService(ApplicationDbContext context)
+//     {
+//         _context = context;
+//     }
+
+//     // Create new prescription with optional manual QR
+//     public async Task<Prescription> CreatePrescriptionAsync(Prescription prescription, string? manualQrId = null)
+//     {
+//         _context.Prescriptions.Add(prescription);
+//         await _context.SaveChangesAsync();
+
+//         // QR content: manual or auto
+//         string qrContent = string.IsNullOrEmpty(manualQrId) ? $"PRESC-{prescription.Id}" : manualQrId;
+//         prescription.QRCodeData = qrContent;
+
+//         // Generate Base64 QR code
+//         using (var qrGenerator = new QRCoder.QRCodeGenerator())
+//         {
+//             var qrData = qrGenerator.CreateQrCode(qrContent, QRCoder.QRCodeGenerator.ECCLevel.Q);
+//             var pngQrCode = new QRCoder.PngByteQRCode(qrData);
+//             byte[] qrCodeBytes = pngQrCode.GetGraphic(20);
+//             prescription.QRCode = Convert.ToBase64String(qrCodeBytes);
+//         }
+
+//         await _context.SaveChangesAsync();
+//         return prescription;
+//     }
+
+//     public async Task<Prescription?> GetPrescriptionByIdAsync(int id)
+//     {
+//         return await _context.Prescriptions
+//             .Include(p => p.Items)
+//             .Include(p => p.Doctor)
+//             .Include(p => p.Hospital)
+//             .Include(p => p.Patient)
+//             .FirstOrDefaultAsync(p => p.Id == id);
+//     }
+
+//     public async Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync()
+//     {
+//         return await _context.Prescriptions
+//             .Include(p => p.Items)
+//             .Include(p => p.Doctor)
+//             .Include(p => p.Hospital)
+//             .Include(p => p.Patient)
+//             .ToListAsync();
+//     }
+
+//     public async Task<PrescriptionQRDTO> GetByQRCodeAsync(string qrCodeData)
+//     {
+//         var prescription = await _context.Prescriptions
+//             .Include(p => p.Items)
+//             .Include(p => p.Doctor)
+//             .Include(p => p.Hospital)
+//             .Include(p => p.Patient)
+//             .FirstOrDefaultAsync(p => p.QRCodeData == qrCodeData || p.QRCode == qrCodeData);
+
+//         if (prescription == null)
+//             throw new Exception("Prescription not found.");
+
+//         return new PrescriptionQRDTO
+//         {
+//             PrescriptionId = prescription.Id.ToString(),
+//             PatientName = prescription.Patient?.FullName ?? "Unknown",
+//             DoctorName = prescription.Doctor?.FullName ?? "Unknown",
+//             HospitalName = prescription.Hospital?.Name ?? "Unknown",
+//             Medicines = prescription.Items.Select(m => new MedicineDTO
+//             {
+//                 Name = m.MedicineName,
+//                 Dosage = m.Dosage,
+//                 Price = m.Cost
+//             }).ToList(),
+//             IsDispensed = prescription.IsDispensed,
+//             QRCodeData = prescription.QRCodeData ?? prescription.QRCode
+//         };
+//     }
+
+//     public async Task<bool> MarkAsDispensedAsync(string prescriptionId)
+//     {
+//         if (!int.TryParse(prescriptionId, out int id)) return false;
+
+//         var prescription = await _context.Prescriptions.FindAsync(id);
+//         if (prescription == null) return false;
+
+//         prescription.IsDispensed = true;
+//         _context.Prescriptions.Update(prescription);
+//         await _context.SaveChangesAsync();
+
+//         return true;
+//     }
+// }
+
+// }
 using Microsoft.EntityFrameworkCore;
 using SwasthyaChinha.API.Data;
 using SwasthyaChinha.API.Models;
 using SwasthyaChinha.API.Services.Interfaces;
-using SwasthyaChinha.API.DTOs.Pharmacist;
-using SwasthyaChinha.API.DTOs.Doctor;
+using DoctorDTOs = SwasthyaChinha.API.DTOs.Doctor;
+using PharmacistDTOs = SwasthyaChinha.API.DTOs.Pharmacist;
 using SwasthyaChinha.API.DTOs.Patient;
 using QRCoder;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System;
-using System.Collections.Generic;
 
 namespace SwasthyaChinha.API.Services
 {
@@ -210,17 +422,17 @@ namespace SwasthyaChinha.API.Services
             _context = context;
         }
 
-        // Create new prescription with QR generation
-        public async Task<Prescription> CreatePrescriptionAsync(Prescription prescription)
+        // Create new prescription with optional manual QR
+        public async Task<Prescription> CreatePrescriptionAsync(Prescription prescription, string? manualQrId = null)
         {
             _context.Prescriptions.Add(prescription);
             await _context.SaveChangesAsync();
 
-            // Generate QR Code content
-            string qrContent = $"PRESC-{prescription.Id}";
+            // QR content: manual or auto
+            string qrContent = string.IsNullOrEmpty(manualQrId) ? $"PRESC-{prescription.Id}" : manualQrId;
             prescription.QRCodeData = qrContent;
 
-            // Generate Base64 QR image
+            // Generate Base64 QR code
             using (var qrGenerator = new QRCodeGenerator())
             {
                 var qrData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
@@ -233,7 +445,6 @@ namespace SwasthyaChinha.API.Services
             return prescription;
         }
 
-        // Get prescription by ID
         public async Task<Prescription?> GetPrescriptionByIdAsync(int id)
         {
             return await _context.Prescriptions
@@ -244,7 +455,6 @@ namespace SwasthyaChinha.API.Services
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        // Get all prescriptions
         public async Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync()
         {
             return await _context.Prescriptions
@@ -255,8 +465,7 @@ namespace SwasthyaChinha.API.Services
                 .ToListAsync();
         }
 
-        // Get prescription by QR code (works for old and new)
-        public async Task<PrescriptionQRDTO> GetByQRCodeAsync(string qrCodeData)
+        public async Task<DoctorDTOs.PrescriptionQRDTO> GetByQRCodeAsync(string qrCodeData)
         {
             var prescription = await _context.Prescriptions
                 .Include(p => p.Items)
@@ -268,13 +477,13 @@ namespace SwasthyaChinha.API.Services
             if (prescription == null)
                 throw new Exception("Prescription not found.");
 
-            return new PrescriptionQRDTO
+            return new DoctorDTOs.PrescriptionQRDTO
             {
                 PrescriptionId = prescription.Id.ToString(),
                 PatientName = prescription.Patient?.FullName ?? "Unknown",
                 DoctorName = prescription.Doctor?.FullName ?? "Unknown",
                 HospitalName = prescription.Hospital?.Name ?? "Unknown",
-                Medicines = prescription.Items.Select(m => new MedicineDTO
+                Medicines = prescription.Items.Select(m => new DoctorDTOs.MedicineDTO
                 {
                     Name = m.MedicineName,
                     Dosage = m.Dosage,
@@ -285,7 +494,6 @@ namespace SwasthyaChinha.API.Services
             };
         }
 
-        // Mark prescription as dispensed
         public async Task<bool> MarkAsDispensedAsync(string prescriptionId)
         {
             if (!int.TryParse(prescriptionId, out int id)) return false;

@@ -113,5 +113,14 @@ namespace SwasthyaChinha.API.Controllers
 
             return Ok(pharmacist);
         }
+        [HttpGet("prescription/{qrId}")]
+public async Task<IActionResult> GetPrescriptionByQrId(string qrId)
+{
+    var prescription = await _pharmacistService.GetPrescriptionByQrIdAsync(qrId);
+    if (prescription == null) return NotFound("Prescription not found");
+
+    return Ok(prescription);
+}
+
     }
 }

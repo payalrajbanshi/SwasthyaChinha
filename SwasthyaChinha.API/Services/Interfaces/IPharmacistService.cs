@@ -7,5 +7,8 @@ namespace SwasthyaChinha.API.Services.Interfaces
         //Task<PrescriptionQRDTO> GetPrescriptionByQRAsync(string prescriptionId);
         //Task DispenseMedicineAsync(DispenseDTO dto);
         Task<User?> GetProfileAsync(Guid userId);
+        Task<PrescriptionDTO> GetPrescriptionByQrIdAsync(string qrId);
+
+        
     }
 }

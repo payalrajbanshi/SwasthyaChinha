@@ -10,5 +10,6 @@ namespace SwasthyaChinha.API.DTOs.Doctor
         public string HospitalId { get; set; }
         public List<CreateMedicineDTO> Medicines { get; set; }
         public string Diagnosis { get; set; }
+        public string? ManualQRId { get; set; }
     }
 }

@@ -14,10 +14,14 @@ public class QRService
 
         // using var ms = new MemoryStream();
         // bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-         var qrGenerator = new QRCodeGenerator();
-        var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
-        var pngQrCode = new PngByteQRCode(qrCodeData);
-        byte[] qrCodeBytes = pngQrCode.GetGraphic(20);
-        return Convert.ToBase64String(qrCodeBytes);
+        // using var qrGenerator = new QRCoder.QRCodeGenerator();
+        // var qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+        // var pngQrCode = new PngByteQRCode(qrCodeData);
+        // byte[] qrCodeBytes = pngQrCode.GetGraphic(20);
+        // return Convert.ToBase64String(qrCodeBytes);
+            using var qrGenerator = new QRCoder.QRCodeGenerator();
+    var qrCodeData = qrGenerator.CreateQrCode(data, QRCoder.QRCodeGenerator.ECCLevel.M);
+    using var qrCode = new QRCoder.PngByteQRCode(qrCodeData);
+    return Convert.ToBase64String(qrCode.GetGraphic(20));
     }
 }
