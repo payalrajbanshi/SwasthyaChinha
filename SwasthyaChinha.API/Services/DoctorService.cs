@@ -270,54 +270,7 @@ namespace SwasthyaChinha.API.Services
                 .Distinct()
                 .ToListAsync();
         }
-        // public async Task<DoctorProfileDTO> UpdateProfileAsync(UpdateDoctorProfileDTO dto, string doctorId)
-        // {
-        //     if (!Guid.TryParse(doctorId, out var doctorGuid))
-        //         throw new Exception("Invalid doctor ID");
-
-        //     var doctor = await _context.Users
-        //         .FirstOrDefaultAsync(u => u.Id == doctorGuid && u.Role == "Doctor");
-
-        //     if (doctor == null)
-        //         throw new Exception("Doctor not found");
-
-        //     doctor.FullName = dto.FullName;
-        //     doctor.Specialty = dto.Specialty;
-
-        //     if (dto.ProfilePicture != null)
-        //     {
-        //         // Save file to wwwroot/uploads or any folder
-        //         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-        //         if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-        //         var uniqueFileName = $"{Guid.NewGuid()}_{dto.ProfilePicture.FileName}";
-        //         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        //         using (var stream = new FileStream(filePath, FileMode.Create))
-        //         {
-        //             await dto.ProfilePicture.CopyToAsync(stream);
-        //         }
-
-        //         // Store relative URL
-        //         doctor.ProfileImageUrl = $"/uploads/{uniqueFileName}";
-        //     }
-
-        //     await _context.SaveChangesAsync();
-
-        //     // Return updated DTO
-        //     return new DoctorProfileDTO
-        //     {
-        //         Id = doctor.Id.ToString(),
-        //         FullName = doctor.FullName,
-        //         Email = doctor.Email,
-        //         Specialty = doctor.Specialty,
-        //         ProfileImageUrl = $"/uploads/{uniqueFileName}",
-        //         HospitalId = doctor.HospitalId ?? Guid.Empty,
-        //         HospitalName = doctor.Hospital?.Name,
-        //         HospitalAddress = doctor.Hospital?.Address,
-        //         SignatureUrl = doctor.SignatureUrl
-        //     };
-        // }
+       
 public async Task<DoctorProfileDTO> UpdateProfileAsync(UpdateDoctorProfileDTO dto, string doctorId)
 {
     if (!Guid.TryParse(doctorId, out var doctorGuid))

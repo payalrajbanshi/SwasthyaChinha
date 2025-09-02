@@ -167,10 +167,10 @@ export const getPrescriptionByQR = async (qr, token) => {
   }
 };
 
-export const dispenseMedicine = async (prescriptionId, token) => {
+export const dispenseMedicine = async (dto, token) => {
   const response = await axios.post(
     `${API_URL}/dispense`,
-    { prescriptionId },
+    dto,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;

@@ -635,6 +635,185 @@
 //   );
 // }
  
+// import { useState, useEffect } from "react";
+// import PrescriptionCard from "../../components/pharmacist/PrescriptionCard";
+// import PharmacistProfileCard from "../../components/pharmacist/PharmacistProfileCard";
+// import { getPrescriptionByQR, dispenseMedicine, getPharmacistProfile } from "../../services/pharmacistService";
+
+// export default function PharmacistDashboard() {
+//   const [pharmacist, setPharmacist] = useState(null);
+//   const [prescription, setPrescription] = useState(null);
+//   const [qrCodeData, setQrCodeData] = useState(""); // manual QRCodeData entry
+//   const [error, setError] = useState("");
+//   const token = localStorage.getItem("token");
+
+//   // Load pharmacist profile
+//   useEffect(() => {
+//     if (!token) return;
+//     getPharmacistProfile(token)
+//       .then(setPharmacist)
+//       .catch(() => setError("Failed to load profile"));
+//   }, [token]);
+
+//   // Fetch prescription by QRCodeData
+//   const handleFetch = async () => {
+//     if (!qrCodeData.trim()) return;
+//     try {
+//       const data = await getPrescriptionByQR(qrCodeData.trim(), token);
+//       setPrescription(data);
+//       setError("");
+//     } catch {
+//       setError("Prescription not found");
+//       setPrescription(null);
+//     }
+//   };
+
+//   // Handle price change for individual medicine
+//   const handlePriceChange = (index, value) => {
+//     const updatedMedicines = [...prescription.medicines];
+//     updatedMedicines[index].price = parseFloat(value) || 0;
+//     setPrescription({ ...prescription, medicines: updatedMedicines });
+//   };
+
+//   // Calculate total cost (optional)
+//   const calculateTotalPrice = () => {
+//     if (!prescription || !prescription.medicines) return 0;
+//     return prescription.medicines.reduce((sum, m) => sum + (m.price || 0), 0);
+//   };
+
+//   // // Dispense medicine with price info
+//   // const handleDispense = async () => {
+//   //   console.log("Prescription object:", prescription);
+//   //   if (!prescription) return;
+
+//   //   const dto = {
+//   //     //prescriptionId: prescription.id.toString(),
+//   //     //prescriptionId: (prescription.id || prescription.prescriptionId).toString(),
+//   //     prescriptionId: String(prescription.prescriptionId ?? prescription.id),
+//   //     medicines: prescription.medicines.map((m) => ({
+//   //       name: m.name,
+//   //       dosage: m.dosage,
+//   //       price: m.price || 0,
+//   //       instructions: m.instructions || "",
+//   //     })),
+//   //   };
+//   //   console.log("DTO being sent:", dto);
+//   //   try {
+//   //     await dispenseMedicine(dto, token); // backend should accept this DTO
+//   //     setPrescription({ ...prescription, isDispensed: true });
+//   //   } catch {
+//   //     setError("Failed to dispense");
+//   //   }
+//   // };
+//   // const handleDispense = async (prescription) => {
+//   // const dto = {
+//   //   prescriptionId: String(prescription.prescriptionId ?? prescription.id),
+//   //   totalCost: prescription.medicines.reduce((sum, m) => sum + (m.price || 0), 0),
+//   //   pharmacistId: pharmacist?.id || "",   // get pharmacist id from logged-in user
+//   //   medicines: prescription.medicines.map((m) => ({
+//   //     name: m.name,
+//   //     dosage: m.dosage,
+//   //     price: m.price || 0,
+//   //     instructions: m.instructions || "",
+//   //   })),
+//   // };
+//   const meds = prescription.medicines ?? prescription.items ?? [];
+// const dto = {
+//   prescriptionId: String(prescription.prescriptionId ?? prescription.id),
+//   totalCost: meds.reduce((sum, m) => sum + (m.price || 0), 0),
+//   pharmacistId: pharmacist?.id || "",
+//   medicines: meds.map((m) => ({
+//     name: m.name ?? m.medicineName,
+//     dosage: m.dosage,
+//     price: m.price || 0,
+//     instructions: m.instructions || "",
+//   })),
+// };
+
+
+//   console.log("DTO being sent:", dto);
+
+//   try {
+//     await dispenseMedicine(dto, token);
+//     alert("Dispensed successfully!");
+//   } catch (error) {
+//     console.error("Dispense error:", error);
+//   }
+// };
+
+
+//   return (
+//     <div className="p-4 space-y-6">
+//       {pharmacist && <PharmacistProfileCard pharmacist={pharmacist} />}
+//       <h1 className="text-xl font-bold mb-4">Pharmacist Dashboard</h1>
+
+//       {/* Manual QRCodeData input */}
+//       <div className="flex gap-2 my-4">
+//         <input
+//           type="text"
+//           placeholder="Enter QRCodeData (e.g., PRESC-XXXX)"
+//           value={qrCodeData}
+//           onChange={(e) => setQrCodeData(e.target.value)}
+//           className="border p-2 rounded flex-1"
+//         />
+//         <button
+//           onClick={handleFetch}
+//           className="bg-blue-500 text-white px-4 py-2 rounded"
+//         >
+//           Search Prescription
+//         </button>
+//       </div>
+
+//       {/* Error message */}
+//       {error && <p className="text-red-500">{error}</p>}
+
+//       {/* Prescription card */}
+//       {prescription && (
+//         <div className="border p-4 rounded space-y-4">
+//           <h2 className="text-lg font-semibold">Prescription: {prescription.qrCodeData}</h2>
+//               <p><strong>Patient:</strong> {prescription.patientName}</p>
+//     <p><strong>Doctor:</strong> {prescription.doctorName}</p>
+//     <p><strong>Diagnosis:</strong> {prescription.diagnosis}</p>
+
+//           {/* Medicines with price input */}
+//           {prescription.medicines.map((med, i) => (
+//             <div key={i} className="flex gap-2 items-center my-1">
+//               <span className="w-32">{med.name} ({med.dosage})</span>
+//               <input
+//                 type="number"
+//                 placeholder="Enter price"
+//                 value={med.price || ""}
+//                 onChange={(e) => handlePriceChange(i, e.target.value)}
+//                 className="border p-1 rounded w-24"
+//               />
+//             </div>
+//           ))}
+
+//           {/* Total cost display */}
+//           <div className="mt-2 font-semibold">
+//             Total: {calculateTotalPrice()} 
+//           </div>
+
+//           {/* Dispense button */}
+//           {!prescription.isDispensed && (
+//             <button
+//               onClick={handleDispense}
+//               className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+//             >
+//               Dispense
+//             </button>
+//           )}
+
+//           {prescription.isDispensed && (
+//             <p className="text-green-600 font-semibold mt-2">
+//               Prescription dispensed successfully
+//             </p>
+//           )}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 import { useState, useEffect } from "react";
 import PrescriptionCard from "../../components/pharmacist/PrescriptionCard";
 import PharmacistProfileCard from "../../components/pharmacist/PharmacistProfileCard";
@@ -643,7 +822,7 @@ import { getPrescriptionByQR, dispenseMedicine, getPharmacistProfile } from "../
 export default function PharmacistDashboard() {
   const [pharmacist, setPharmacist] = useState(null);
   const [prescription, setPrescription] = useState(null);
-  const [qrCodeData, setQrCodeData] = useState(""); // manual QRCodeData entry
+  const [qrCodeData, setQrCodeData] = useState("");
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
 
@@ -655,7 +834,7 @@ export default function PharmacistDashboard() {
       .catch(() => setError("Failed to load profile"));
   }, [token]);
 
-  // Fetch prescription by QRCodeData
+  // Fetch prescription by QR
   const handleFetch = async () => {
     if (!qrCodeData.trim()) return;
     try {
@@ -668,37 +847,47 @@ export default function PharmacistDashboard() {
     }
   };
 
-  // Handle price change for individual medicine
+  // Update medicine price
   const handlePriceChange = (index, value) => {
-    const updatedMedicines = [...prescription.medicines];
-    updatedMedicines[index].price = parseFloat(value) || 0;
-    setPrescription({ ...prescription, medicines: updatedMedicines });
+    if (!prescription) return;
+    const meds = prescription.medicines ?? prescription.items ?? [];
+    meds[index].price = parseFloat(value) || 0;
+    setPrescription({ ...prescription, medicines: meds });
   };
 
-  // Calculate total cost (optional)
+  // Calculate total price
   const calculateTotalPrice = () => {
-    if (!prescription || !prescription.medicines) return 0;
-    return prescription.medicines.reduce((sum, m) => sum + (m.price || 0), 0);
+    if (!prescription) return 0;
+    const meds = prescription.medicines ?? prescription.items ?? [];
+    return meds.reduce((sum, m) => sum + (m.price || 0), 0);
   };
 
-  // Dispense medicine with price info
+  // Dispense medicines
   const handleDispense = async () => {
     if (!prescription) return;
 
+    const meds = prescription.medicines ?? prescription.items ?? [];
     const dto = {
-      prescriptionId: prescription.id,
-      medicines: prescription.medicines.map((m) => ({
-        name: m.name,
+      prescriptionId: String(prescription.prescriptionId ?? prescription.id),
+      totalCost: meds.reduce((sum, m) => sum + (m.price || 0), 0),
+      pharmacistId: pharmacist?.id || "",
+      medicines: meds.map((m) => ({
+        name: m.name ?? m.medicineName,
         dosage: m.dosage,
-        price: m.price,
-        instructions: m.instructions,
+        price: m.price || 0,
+        instructions: m.instructions || "",
       })),
     };
 
+    console.log("Prescription object:", prescription);
+    console.log("DTO being sent:", dto);
+
     try {
-      await dispenseMedicine(dto, token); // backend should accept this DTO
+      await dispenseMedicine(dto, token);
       setPrescription({ ...prescription, isDispensed: true });
-    } catch {
+      alert("Dispensed successfully!");
+    } catch (err) {
+      console.error("Dispense error:", err);
       setError("Failed to dispense");
     }
   };
@@ -706,9 +895,10 @@ export default function PharmacistDashboard() {
   return (
     <div className="p-4 space-y-6">
       {pharmacist && <PharmacistProfileCard pharmacist={pharmacist} />}
+
       <h1 className="text-xl font-bold mb-4">Pharmacist Dashboard</h1>
 
-      {/* Manual QRCodeData input */}
+      {/* QR input */}
       <div className="flex gap-2 my-4">
         <input
           type="text"
@@ -725,21 +915,19 @@ export default function PharmacistDashboard() {
         </button>
       </div>
 
-      {/* Error message */}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Prescription card */}
+      {/* Prescription details */}
       {prescription && (
         <div className="border p-4 rounded space-y-4">
           <h2 className="text-lg font-semibold">Prescription: {prescription.qrCodeData}</h2>
-              <p><strong>Patient:</strong> {prescription.patientName}</p>
-    <p><strong>Doctor:</strong> {prescription.doctorName}</p>
-    <p><strong>Diagnosis:</strong> {prescription.diagnosis}</p>
+          <p><strong>Patient:</strong> {prescription.patientName}</p>
+          <p><strong>Doctor:</strong> {prescription.doctorName}</p>
+          <p><strong>Diagnosis:</strong> {prescription.diagnosis}</p>
 
-          {/* Medicines with price input */}
-          {prescription.medicines.map((med, i) => (
+          {(prescription.medicines ?? prescription.items ?? []).map((med, i) => (
             <div key={i} className="flex gap-2 items-center my-1">
-              <span className="w-32">{med.name} ({med.dosage})</span>
+              <span className="w-32">{med.name ?? med.medicineName} ({med.dosage})</span>
               <input
                 type="number"
                 placeholder="Enter price"
@@ -750,12 +938,8 @@ export default function PharmacistDashboard() {
             </div>
           ))}
 
-          {/* Total cost display */}
-          <div className="mt-2 font-semibold">
-            Total: {calculateTotalPrice()} 
-          </div>
+          <div className="mt-2 font-semibold">Total: {calculateTotalPrice()}</div>
 
-          {/* Dispense button */}
           {!prescription.isDispensed && (
             <button
               onClick={handleDispense}

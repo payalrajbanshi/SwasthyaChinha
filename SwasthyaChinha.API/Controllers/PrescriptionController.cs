@@ -285,24 +285,24 @@ namespace SwasthyaChinha.API.Controllers
 
         //     return Ok("Prescription marked as dispensed.");
         // }
-        [HttpPost("dispense")]
-[Authorize(Roles = "Pharmacist,Admin")]
-public async Task<IActionResult> MarkAsDispensed([FromBody] DispenseDTO dto)
-{
-    if (dto == null || string.IsNullOrEmpty(dto.PrescriptionId) || dto.Medicines == null)
-        return BadRequest("Invalid dispense data.");
+//         [HttpPost("dispense")]
+// [Authorize(Roles = "Pharmacist,Admin")]
+// public async Task<IActionResult> MarkAsDispensed([FromBody] DispenseDTO dto)
+// {
+//     if (dto == null || string.IsNullOrEmpty(dto.PrescriptionId) || dto.Medicines == null)
+//         return BadRequest("Invalid dispense data.");
 
-    var success = await _prescriptionService.MarkAsDispensedAsync(dto.PrescriptionId, dto.Medicines);
+//     var success = await _prescriptionService.MarkAsDispensedAsync(dto.PrescriptionId, dto.Medicines);
 
-    if (!success)
-        return NotFound("Prescription not found.");
+//     if (!success)
+//         return NotFound("Prescription not found.");
 
-    return Ok(new
-    {
-        Success = true,
-        Message = "Prescription marked as dispensed."
-    });
-}
+//     return Ok(new
+//     {
+//         Success = true,
+//         Message = "Prescription marked as dispensed."
+//     });
+// }
 
     }
 }
