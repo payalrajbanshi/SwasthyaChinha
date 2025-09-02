@@ -17,6 +17,7 @@ namespace SwasthyaChinha.API.DTOs.Pharmacist
     {
         public string Name { get; set; }
         public string Dosage { get; set; }
+        public decimal Price { get; set; } 
         public string Instructions { get; set; }
     }
 }

@@ -13,8 +13,10 @@ namespace SwasthyaChinha.API.Models
         public DateTime CreatedAt { get; set; }
         public string? QRCode { get; set; }
         // NEW: the short string you search by (e.g., "PRESC-123")
-        [NotMapped]
+        
     public string? QRCodeData { get; set; }
+    // NEW: A human-readable/manual ID (fallback if QR scan fails)
+    //public string? ManualQRId { get; set; }
         public decimal? TotalCost { get; set; }
         public bool IsDispensed { get; set; } = false; // ✅ New property
         public string? Diagnosis { get; set; }

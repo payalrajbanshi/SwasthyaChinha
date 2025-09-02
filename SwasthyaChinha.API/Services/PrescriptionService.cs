@@ -400,6 +400,8 @@
 using Microsoft.EntityFrameworkCore;
 using SwasthyaChinha.API.Data;
 using SwasthyaChinha.API.Models;
+using SwasthyaChinha.API.DTOs.Pharmacist;
+
 using SwasthyaChinha.API.Services.Interfaces;
 using DoctorDTOs = SwasthyaChinha.API.DTOs.Doctor;
 using PharmacistDTOs = SwasthyaChinha.API.DTOs.Pharmacist;
@@ -427,15 +429,16 @@ namespace SwasthyaChinha.API.Services
         {
             _context.Prescriptions.Add(prescription);
             await _context.SaveChangesAsync();
+            prescription.QRCodeData = $"PRESC-{Guid.NewGuid().ToString().Substring(0, 8)}";
 
             // QR content: manual or auto
-            string qrContent = string.IsNullOrEmpty(manualQrId) ? $"PRESC-{prescription.Id}" : manualQrId;
-            prescription.QRCodeData = qrContent;
+            //string qrContent = string.IsNullOrEmpty(manualQrId) ? $"PRESC-{prescription.Id}" : manualQrId;
+            //prescription.QRCodeData = qrContent;
 
             // Generate Base64 QR code
             using (var qrGenerator = new QRCodeGenerator())
             {
-                var qrData = qrGenerator.CreateQrCode(qrContent, QRCodeGenerator.ECCLevel.Q);
+                var qrData = qrGenerator.CreateQrCode(prescription.QRCodeData, QRCodeGenerator.ECCLevel.Q);
                 var pngQrCode = new PngByteQRCode(qrData);
                 byte[] qrCodeBytes = pngQrCode.GetGraphic(20);
                 prescription.QRCode = Convert.ToBase64String(qrCodeBytes);
@@ -483,6 +486,7 @@ namespace SwasthyaChinha.API.Services
                 PatientName = prescription.Patient?.FullName ?? "Unknown",
                 DoctorName = prescription.Doctor?.FullName ?? "Unknown",
                 HospitalName = prescription.Hospital?.Name ?? "Unknown",
+                Diagnosis = prescription.Diagnosis,
                 Medicines = prescription.Items.Select(m => new DoctorDTOs.MedicineDTO
                 {
                     Name = m.MedicineName,
@@ -490,22 +494,42 @@ namespace SwasthyaChinha.API.Services
                     Price = m.Cost
                 }).ToList(),
                 IsDispensed = prescription.IsDispensed,
-                QRCodeData = prescription.QRCodeData ?? prescription.QRCode
+                //QRCodeData = prescription.QRCodeData ?? prescription.QRCode
+                QRCodeData = prescription.QRCodeData ?? $"PRESC-{prescription.Id}",
             };
         }
+public async Task<bool> MarkAsDispensedAsync(string prescriptionId, List<MedicineDTO> prices)
+{
+    if (!int.TryParse(prescriptionId, out int id)) return false;
 
-        public async Task<bool> MarkAsDispensedAsync(string prescriptionId)
+var prescription = await _context.Prescriptions
+    .Include(p => p.Items)
+    .FirstOrDefaultAsync(p => p.Id == id);
+
+    // var prescription = await _context.Prescriptions
+            //     .Include(p => p.Items)
+            //     .FirstOrDefaultAsync(p => p.Id == prescriptionId);
+
+            if (prescription == null)
+                return false;
+
+    // Update medicine prices
+    foreach (var item in prescription.Items)
+    {
+        var priceDto = prices.FirstOrDefault(p => p.Name == item.MedicineName);
+        if (priceDto != null)
         {
-            if (!int.TryParse(prescriptionId, out int id)) return false;
-
-            var prescription = await _context.Prescriptions.FindAsync(id);
-            if (prescription == null) return false;
-
-            prescription.IsDispensed = true;
-            _context.Prescriptions.Update(prescription);
-            await _context.SaveChangesAsync();
-
-            return true;
+            item.Cost = priceDto.Price;
         }
+    }
+
+    // Mark prescription as dispensed
+    prescription.IsDispensed = true;
+
+    await _context.SaveChangesAsync();
+    return true;
+}
+
+
     }
 }

@@ -7,6 +7,7 @@ namespace SwasthyaChinha.API.DTOs.Pharmacist
         public string PrescriptionId { get; set; }
         public string PatientName { get; set; }
         public string DoctorName { get; set; }
+        public string Diagnosis { get; set; }
 public string HospitalName { get; set; }
 
         public List<MedicineDTO> Medicines { get; set; }

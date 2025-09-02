@@ -19,6 +19,7 @@ namespace SwasthyaChinha.API.DTOs.Doctor
         public bool IsDispensed { get; set; }
         public string QRCode { get; set; }       // Base64 QR image
         public string QRCodeData { get; set; }   // Raw QRID fallback
+        public string Diagnosis { get; set; }
     }
 
     // public class MedicineDTO

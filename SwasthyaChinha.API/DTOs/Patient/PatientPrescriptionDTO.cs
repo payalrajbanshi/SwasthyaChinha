@@ -14,7 +14,8 @@ namespace SwasthyaChinha.API.DTOs.Patient
         public string PatientName { get; set; }
         public int PatientAge { get; set; } // compute from DateOfBirth
         public string Diagnosis { get; set; }
-        public string QRCodeData => PrescriptionId;
+        public string QRCodeData { get; set; }
+        public string QRCode { get; set; }
     }
     //  public class MedicineDTO
     // {

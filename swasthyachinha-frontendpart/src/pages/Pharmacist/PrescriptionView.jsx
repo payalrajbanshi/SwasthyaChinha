@@ -1,10 +1,60 @@
+// import { useEffect, useState } from "react";
+// import { useParams } from "react-router-dom";
+// import { getPrescriptionByQR } from "../../services/pharmacistService";
+// import PrescriptionCard from "../../components/pharmacist/PrescriptionCard";
+
+// export default function PrescriptionView() {
+//   const { qr } = useParams();
+//   const [prescription, setPrescription] = useState(null);
+//   const [error, setError] = useState("");
+//   const token = localStorage.getItem("token");
+
+//   useEffect(() => {
+//     const fetchPrescription = async () => {
+//       try {
+//         const data = await getPrescriptionByQR(qr, token);
+//         setPrescription(data);
+//       } catch {
+//         setError("Prescription not found");
+//       }
+//     };
+//     fetchPrescription();
+//   }, [qr, token]);
+
+//   if (error) return <p className="text-red-500 p-4">{error}</p>;
+//   if (!prescription) return <p className="p-4">Loading...</p>;
+
+//   return (
+//     <div className="p-4">
+//       <PrescriptionCard
+//         prescription={prescription}
+//         onDispense={async () => {
+//           // call dispense service
+//           try {
+//             await fetch(`/api/pharmacist/dispense`, {
+//               method: "POST",
+//               headers: {
+//                 "Content-Type": "application/json",
+//                 Authorization: `Bearer ${token}`,
+//               },
+//               body: JSON.stringify({ PrescriptionId: prescription.prescriptionId }),
+//             });
+//             setPrescription({ ...prescription, isDispensed: true });
+//           } catch {
+//             alert("Failed to dispense");
+//           }
+//         }}
+//       />
+//     </div>
+//   );
+// }
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getPrescriptionByQR } from "../../services/pharmacistService";
+import { getPrescriptionByQR, dispenseMedicine } from "../../services/pharmacistService";
 import PrescriptionCard from "../../components/pharmacist/PrescriptionCard";
 
 export default function PrescriptionView() {
-  const { qr } = useParams();
+  const { qr } = useParams(); // this is QRCodeData from the URL
   const [prescription, setPrescription] = useState(null);
   const [error, setError] = useState("");
   const token = localStorage.getItem("token");
@@ -28,22 +78,18 @@ export default function PrescriptionView() {
     <div className="p-4">
       <PrescriptionCard
         prescription={prescription}
-        onDispense={async () => {
-          // call dispense service
-          try {
-            await fetch(`/api/pharmacist/dispense`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ PrescriptionId: prescription.prescriptionId }),
-            });
-            setPrescription({ ...prescription, isDispensed: true });
-          } catch {
-            alert("Failed to dispense");
-          }
-        }}
+        onDispense={
+          !prescription.isDispensed
+            ? async () => {
+                try {
+                  await dispenseMedicine(prescription.prescriptionId, token);
+                  setPrescription({ ...prescription, isDispensed: true });
+                } catch {
+                  alert("Failed to dispense");
+                }
+              }
+            : null
+        }
       />
     </div>
   );
