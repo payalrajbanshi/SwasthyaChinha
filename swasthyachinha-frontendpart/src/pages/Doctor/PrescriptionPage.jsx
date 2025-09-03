@@ -3005,6 +3005,839 @@
 
 
 
+
+
+
+
+
+// import React, { useEffect, useState, useRef } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { createPrescription, getDoctorProfile } from "../../services/doctorService";
+// import Sidebar from "../../components/dashboard/Sidebar";
+// import api from "../../services/api";
+// import * as jwt_decode from "jwt-decode";
+
+// const PrescriptionPage = () => {
+//   const navigate = useNavigate();
+//   const [loading, setLoading] = useState(true);
+//   const [doctorInfo, setDoctorInfo] = useState({});
+//   const [formData, setFormData] = useState({
+//     patientId: "",
+//     hospitalId: "",
+//     diagnosis: "",
+//     medicines: [{ name: "", dosage: "" }]
+//   });
+//   const [qrCode, setQrCode] = useState(null);
+//   const [successMsg, setSuccessMsg] = useState("");
+
+//   // Patient search states
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [searchResults, setSearchResults] = useState([]);
+//   const [selectedPatient, setSelectedPatient] = useState(null);
+//   const searchTimeout = useRef(null); // For debouncing
+
+//   // Medicine autocomplete state
+//   const [medicineSuggestions, setMedicineSuggestions] = useState([]);
+
+//   // Fetch doctor profile
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       try {
+//         const profile = await getDoctorProfile();
+
+//         // Get hospitalId from JWT token if profile.hospitalId is null
+//         let hospitalId = profile.hospitalId;
+//         if (!hospitalId) {
+//           const token = localStorage.getItem("token");
+//           if (token) {
+//             const decoded = jwt_decode.default(token);
+//             hospitalId = decoded["hospitalId"] || null;
+//           }
+//         }
+
+//         setDoctorInfo(profile);
+//         setFormData((prev) => ({
+//           ...prev,
+//           hospitalId: hospitalId || ""
+//         }));
+//       } catch (err) {
+//         console.error("Error fetching profile", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProfile();
+//   }, []);
+
+//   // Debounced search for patients
+//   const handleSearch = (value) => {
+//     setSearchQuery(value);
+//     setSelectedPatient(null);
+
+//     if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
+//     if (value.trim().length < 2) {
+//       setSearchResults([]);
+//       return;
+//     }
+
+//     searchTimeout.current = setTimeout(async () => {
+//       try {
+//         const res = await api.get(`/doctor/search-patients?query=${value}`);
+//         setSearchResults(Array.isArray(res.data) ? res.data : []);
+//       } catch (err) {
+//         console.error("Search failed", err);
+//         setSearchResults([]);
+//       }
+//     }, 500);
+//   };
+
+//   const selectPatient = (patient) => {
+//     setSelectedPatient(patient);
+//     setSearchQuery(patient.name);
+//     setFormData((prev) => ({
+//       ...prev,
+//       patientId: patient.id
+//     }));
+//     setSearchResults([]);
+//   };
+
+//   const handleMedicineChange = (index, field, value) => {
+//     const updated = [...formData.medicines];
+//     updated[index][field] = value;
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   const addMedicine = () => {
+//     setFormData({
+//       ...formData,
+//       medicines: [...formData.medicines, { name: "", dosage: "" }]
+//     });
+//   };
+
+//   const removeMedicine = (index) => {
+//     const updated = formData.medicines.filter((_, i) => i !== index);
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   // Fetch medicine suggestions from ML API
+//   const fetchMedicineSuggestions = async (query, index) => {
+//     if (query.length < 2) {
+//       setMedicineSuggestions((prev) => ({ ...prev, [index]: [] }));
+//       return;
+//     }
+
+//     try {
+//       const res = await fetch("http://127.0.0.1:5000/autocomplete", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ text: query}),
+//       });
+//       const data = await res.json();
+//       console.log("🔎 Suggestions from API:", data);
+//       //setMedicineSuggestions(data.suggestions || []);
+//           setMedicineSuggestions((prev) => ({
+//       ...prev,
+//       [index]: data.suggestions || [],
+//     }));
+//     } catch (error) {
+//       console.error("Error fetching medicine suggestions:", error);
+//     }
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setSuccessMsg("");
+//     setQrCode(null);
+
+//     try {
+//       const res = await createPrescription(formData);
+//       const qr = res.qrCode || formData.manualQRId;
+//       if (res.qrCode) {
+//         setQrCode(res.qrCode);
+//         setSuccessMsg("✅ Prescription sent successfully!");
+//       }
+//     } catch (error) {
+//       console.error("Error creating prescription:", error);
+//       alert("❌ Failed to create prescription");
+//     }
+//   };
+
+//   if (loading) return <div className="p-6">Loading prescription page...</div>;
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       <Sidebar />
+//       <div className="flex-1 p-6">
+//         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
+//           {/* Hospital Info */}
+//           <div className="text-center border-b pb-3">
+//             <h1 className="text-2xl font-bold">{doctorInfo.hospitalName}</h1>
+//             <p className="text-gray-600">{doctorInfo.hospitalAddress}</p>
+//           </div>
+
+//           {/* Doctor Info */}
+//           <div className="flex justify-between mt-4 border-b pb-3">
+//             <div>
+//               <p className="font-semibold">{doctorInfo.fullName}</p>
+//               <p className="text-gray-600">{doctorInfo.specialty}</p>
+//             </div>
+//             {doctorInfo.signatureUrl && (
+//               <img
+//                 src={doctorInfo.signatureUrl}
+//                 alt="Doctor Signature"
+//                 className="h-12"
+//               />
+//             )}
+//           </div>
+
+//           {/* Prescription Form */}
+//           <form onSubmit={handleSubmit} className="mt-6">
+//             {/* Patient Search */}
+//             <div className="mb-4">
+//               <label className="block font-medium mb-1">Search Patient</label>
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => handleSearch(e.target.value)}
+//                 placeholder="Type patient name or phone..."
+//                 className="border rounded p-2 w-full"
+//               />
+//               {searchResults.length > 0 && (
+//                 <ul className="border rounded bg-white mt-1 max-h-40 overflow-y-auto">
+//                   {searchResults.map((p) => {
+//                     const regex = new RegExp(`(${searchQuery})`, "gi");
+//                     const highlightedName = p.name.replace(
+//                       regex,
+//                       (match) => `<span class="bg-yellow-200">${match}</span>`
+//                     );
+//                     const highlightedPhone = p.phone.replace(
+//                       regex,
+//                       (match) => `<span class="bg-yellow-200">${match}</span>`
+//                     );
+//                     return (
+//                       <li
+//                         key={p.id}
+//                         onClick={() => selectPatient(p)}
+//                         className="p-2 hover:bg-gray-200 cursor-pointer"
+//                         dangerouslySetInnerHTML={{ __html: `${highlightedName} — ${highlightedPhone}` }}
+//                       />
+//                     );
+//                   })}
+//                 </ul>
+//               )}
+//               {selectedPatient && (
+//                 <p className="mt-2 text-green-600">
+//                   ✅ Selected: {selectedPatient.name} ({selectedPatient.id})
+//                 </p>
+//               )}
+//             </div>
+
+//             {/* Diagnosis / Disease */}
+//             <div className="mb-4">
+//               <label className="block font-medium mb-1">Diagnosis / Disease</label>
+//               <input
+//                 type="text"
+//                 placeholder="Enter diagnosis or disease"
+//                 value={formData.diagnosis}
+//                 onChange={(e) =>
+//                   setFormData({ ...formData, diagnosis: e.target.value })
+//                 }
+//                 className="border rounded p-2 w-full"
+//               />
+//             </div>
+//             {/* Manual QR ID */}
+// <div className="mb-4">
+//   <label className="block font-medium mb-1">Manual QR ID (optional)</label>
+//   <input
+//     type="text"
+//     placeholder="Enter manual QR ID if any"
+//     value={formData.manualQRId || ""}
+//     onChange={(e) =>
+//       setFormData({ ...formData, manualQRId: e.target.value })
+//     }
+//     className="border rounded p-2 w-full"
+//   />
+// </div>
+
+
+//             {/* Medicines */}
+//             <div className="mb-4">
+//               <label className="block font-medium">Medicines</label>
+//               {formData.medicines.map((med, index) => (
+//                 <div key={index} className="flex gap-2 mb-2 relative">
+//                   <div className="relative flex-1">
+//                     <input
+//                       type="text"
+//                       placeholder="Medicine Name"
+//                       value={med.name}
+//                       onChange={(e) => {
+//                         handleMedicineChange(index, "name", e.target.value);
+//                         fetchMedicineSuggestions(e.target.value, index);
+//                       }}
+//                       className="border p-2 w-full rounded"
+//                       required
+//                     />
+//                     {medicineSuggestions[index]?.length > 0 && (
+//                       <ul className="absolute bg-white border rounded mt-1 max-h-40 overflow-y-auto w-full z-10">
+//                         {medicineSuggestions[index].map((s) => (
+//                           <li
+//                             key={s}
+//                             onClick={() => {
+//                               handleMedicineChange(index, "name", s);
+//                               setMedicineSuggestions((prev) => ({...prev, [index]:[]}));
+//                             }}
+//                             className="p-2 hover:bg-gray-200 cursor-pointer"
+//                           >
+//                             {s}
+//                           </li>
+//                         ))}
+//                       </ul>
+//                     )}
+//                   </div>
+//                   <input
+//                     type="text"
+//                     placeholder="Dosage"
+//                     value={med.dosage}
+//                     onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
+//                     className="border p-2 flex-1 rounded"
+//                     required
+//                   />
+//                   {index > 0 && (
+//                     <button
+//                       type="button"
+//                       onClick={() => removeMedicine(index)}
+//                       className="bg-red-500 text-white px-2 rounded"
+//                     >
+//                       ✕
+//                     </button>
+//                   )}
+//                 </div>
+//               ))}
+//               <button type="button" onClick={addMedicine} className="text-blue-500">
+//                 ➕ Add Medicine
+//               </button>
+//             </div>
+
+//             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded w-full">
+//               Send Prescription
+//             </button>
+//           </form>
+
+//           {/* QR Code */}
+//           {qrCode && (
+//             <div className="mt-6 text-center">
+//               <img
+//                 src={`data:image/png;base64,${qrCode}`}
+//                 alt="Prescription QR"
+//                 className="mx-auto w-40 h-40"
+//               />
+//               <p className="mt-2 text-green-600">{successMsg}</p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PrescriptionPage;
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useState, useRef } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { createPrescription, getDoctorProfile } from "../../services/doctorService";
+// import Sidebar from "../../components/dashboard/Sidebar";
+// import api from "../../services/api";
+// import * as jwt_decode from "jwt-decode";
+
+// const PrescriptionPage = () => {
+//   const navigate = useNavigate();
+//   const [loading, setLoading] = useState(true);
+//   const [doctorInfo, setDoctorInfo] = useState({});
+//   const [formData, setFormData] = useState({
+//     patientId: "",
+//     hospitalId: "",
+//     diagnosis: "",
+//     medicines: [{ name: "", dosage: "" }]
+//   });
+//   const [qrCode, setQrCode] = useState(null);
+//   const [successMsg, setSuccessMsg] = useState("");
+
+//   // ✅ NEW state for recommendations
+//   const [recommendations, setRecommendations] = useState({
+//     description: "",
+//     precautions: []
+//   });
+
+//   // Patient search states
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [searchResults, setSearchResults] = useState([]);
+//   const [selectedPatient, setSelectedPatient] = useState(null);
+//   const searchTimeout = useRef(null); // For debouncing
+
+//   // Medicine autocomplete state
+//   const [medicineSuggestions, setMedicineSuggestions] = useState([]);
+
+//   // Fetch doctor profile
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       try {
+//         const profile = await getDoctorProfile();
+
+//         // Get hospitalId from JWT token if profile.hospitalId is null
+//         let hospitalId = profile.hospitalId;
+//         if (!hospitalId) {
+//           const token = localStorage.getItem("token");
+//           if (token) {
+//             const decoded = jwt_decode.default(token);
+//             hospitalId = decoded["hospitalId"] || null;
+//           }
+//         }
+
+//         setDoctorInfo(profile);
+//         setFormData((prev) => ({
+//           ...prev,
+//           hospitalId: hospitalId || ""
+//         }));
+//       } catch (err) {
+//         console.error("Error fetching profile", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProfile();
+//   }, []);
+
+//   // Debounced search for patients
+//   const handleSearch = (value) => {
+//     setSearchQuery(value);
+//     setSelectedPatient(null);
+
+//     if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
+//     if (value.trim().length < 2) {
+//       setSearchResults([]);
+//       return;
+//     }
+
+//     searchTimeout.current = setTimeout(async () => {
+//       try {
+//         const res = await api.get(`/doctor/search-patients?query=${value}`);
+//         setSearchResults(Array.isArray(res.data) ? res.data : []);
+//       } catch (err) {
+//         console.error("Search failed", err);
+//         setSearchResults([]);
+//       }
+//     }, 500);
+//   };
+
+//   const selectPatient = (patient) => {
+//     setSelectedPatient(patient);
+//     setSearchQuery(patient.name);
+//     setFormData((prev) => ({
+//       ...prev,
+//       patientId: patient.id
+//     }));
+//     setSearchResults([]);
+//   };
+
+//   const handleMedicineChange = (index, field, value) => {
+//     const updated = [...formData.medicines];
+//     updated[index][field] = value;
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   const addMedicine = () => {
+//     setFormData({
+//       ...formData,
+//       medicines: [...formData.medicines, { name: "", dosage: "" }]
+//     });
+//   };
+
+//   const removeMedicine = (index) => {
+//     const updated = formData.medicines.filter((_, i) => i !== index);
+//     setFormData({ ...formData, medicines: updated });
+//   };
+
+//   // Fetch medicine suggestions from ML API
+//   const fetchMedicineSuggestions = async (query, index) => {
+//     if (query.length < 2) {
+//       setMedicineSuggestions((prev) => ({ ...prev, [index]: [] }));
+//       return;
+//     }
+
+//     try {
+//       const res = await fetch("http://127.0.0.1:5000/autocomplete", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ text: query}),
+//       });
+//       const data = await res.json();
+//       console.log("🔎 Suggestions from API:", data);
+//       setMedicineSuggestions((prev) => ({
+//         ...prev,
+//         [index]: data.suggestions || [],
+//       }));
+//     } catch (error) {
+//       console.error("Error fetching medicine suggestions:", error);
+//     }
+//   };
+
+//   // ✅ NEW: fetch recommendations from FastAPI
+//   const fetchRecommendations = async (diseaseName) => {
+//     if (!diseaseName || diseaseName.length < 2) {
+//       setRecommendations({ description: "", medications: [],
+//       diets: [],
+//       workout:  [] });
+//       return;
+//     }
+
+//     try {
+//       const res = await fetch("http://127.0.0.1:8000/predict_by_disease", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ disease_name: diseaseName })
+//       });
+
+//       const data = await res.json();
+//       if (data.error) {
+//         setRecommendations({ description: "❌ No info found", medications: [], diets: [], workout: [] });
+//       } else {
+//         setRecommendations({
+//           description: data.description || "",
+//                   medications: data.medications || [],
+//         diets:data.diets ||  [],
+//         workout: data.workout || []
+          
+//         });
+//       }
+      
+//     } catch (err) {
+//       console.error("Error fetching recommendations:", err);
+//       setRecommendations({ description: "⚠️ Failed to fetch", medications: [], diets :[], workout:[] });
+//     }
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setSuccessMsg("");
+//     setQrCode(null);
+
+//     try {
+//       const res = await createPrescription(formData);
+//       const qr = res.qrCode || formData.manualQRId;
+//       if (res.qrCode) {
+//         setQrCode(res.qrCode);
+//         setSuccessMsg("✅ Prescription sent successfully!");
+//       }
+//     } catch (error) {
+//       console.error("Error creating prescription:", error);
+//       alert("❌ Failed to create prescription");
+//     }
+//   };
+
+//   if (loading) return <div className="p-6">Loading prescription page...</div>;
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       <Sidebar />
+//       <div className="flex-1 p-6">
+//         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
+//           {/* Hospital Info */}
+//           <div className="text-center border-b pb-3">
+//             <h1 className="text-2xl font-bold">{doctorInfo.hospitalName}</h1>
+//             <p className="text-gray-600">{doctorInfo.hospitalAddress}</p>
+//           </div>
+
+//           {/* Doctor Info */}
+//           <div className="flex justify-between mt-4 border-b pb-3">
+//             <div>
+//               <p className="font-semibold">{doctorInfo.fullName}</p>
+//               <p className="text-gray-600">{doctorInfo.specialty}</p>
+//             </div>
+//             {doctorInfo.signatureUrl && (
+//               <img
+//                 src={doctorInfo.signatureUrl}
+//                 alt="Doctor Signature"
+//                 className="h-12"
+//               />
+//             )}
+//           </div>
+
+//           {/* Prescription Form */}
+//           <form onSubmit={handleSubmit} className="mt-6">
+//             {/* Patient Search */}
+//             <div className="mb-4">
+//               <label className="block font-medium mb-1">Search Patient</label>
+//               <input
+//                 type="text"
+//                 value={searchQuery}
+//                 onChange={(e) => handleSearch(e.target.value)}
+//                 placeholder="Type patient name or phone..."
+//                 className="border rounded p-2 w-full"
+//               />
+//               {searchResults.length > 0 && (
+//                 <ul className="border rounded bg-white mt-1 max-h-40 overflow-y-auto">
+//                   {searchResults.map((p) => {
+//                     const regex = new RegExp(`(${searchQuery})`, "gi");
+//                     const highlightedName = p.name.replace(
+//                       regex,
+//                       (match) => `<span class="bg-yellow-200">${match}</span>`
+//                     );
+//                     const highlightedPhone = p.phone.replace(
+//                       regex,
+//                       (match) => `<span class="bg-yellow-200">${match}</span>`
+//                     );
+//                     return (
+//                       <li
+//                         key={p.id}
+//                         onClick={() => selectPatient(p)}
+//                         className="p-2 hover:bg-gray-200 cursor-pointer"
+//                         dangerouslySetInnerHTML={{ __html: `${highlightedName} — ${highlightedPhone}` }}
+//                       />
+//                     );
+//                   })}
+//                 </ul>
+//               )}
+//               {selectedPatient && (
+//                 <p className="mt-2 text-green-600">
+//                   ✅ Selected: {selectedPatient.name} ({selectedPatient.id})
+//                 </p>
+//               )}
+//             </div>
+
+//             {/* Diagnosis / Disease */}
+//             <div className="mb-4">
+//               <label className="block font-medium mb-1">Diagnosis / Disease</label>
+//               {/* ✅ Updated input to call fetchRecommendations */}
+//               <input
+//                 type="text"
+//                 placeholder="Enter diagnosis or disease"
+//                 value={formData.diagnosis}
+//                 onChange={(e) => {
+//                   const value = e.target.value;
+//                   setFormData({ ...formData, diagnosis: value });
+//                   fetchRecommendations(value); // 👈 fetch recommendations on typing
+//                 }}
+//                 className="border rounded p-2 w-full"
+//               />
+//             </div>
+
+//             {/* ✅ Recommendations Section */}
+//             {/* {recommendations.description && (
+//               <div className="mb-4 bg-gray-50 border p-3 rounded">
+//                 <h3 className="font-semibold text-gray-700">Recommendations</h3>
+//                 <p className="text-gray-600 mb-2">{recommendations.description}</p>
+//                 {recommendations.precautions.length > 0 && (
+//                   <ul className="list-disc pl-5 text-gray-600">
+//                     {recommendations.precautions.map((p, i) => (
+//                       <li key={i}>{p}</li>
+//                     ))}
+//                   </ul>
+//                 )}
+//               </div>
+//             )} */}
+//             {/* {(recommendations.description || recommendations.precautions.length > 0) && (
+//   <div className="mb-4 bg-gray-50 border p-3 rounded">
+//     <h3 className="font-semibold text-gray-700">Recommendations</h3>
+//     {recommendations.description && (
+//       <p className="text-gray-600 mb-2">{recommendations.description}</p>
+//     )}
+//     {recommendations.precautions.length > 0 ? (
+//       <ul className="list-disc pl-5 text-gray-600">
+//         {recommendations.precautions.map((p, i) => (
+//           <li key={i}>{p}</li>
+//         ))}
+//       </ul>
+//     ) : (
+//       <p className="text-gray-500">⚠️ No precautions found</p>
+//     )}
+//   </div>
+// )} */}
+
+
+
+
+
+// {/* {(recommendations.description ||
+//   recommendations.medications?.length > 0 ||
+//   recommendations.diets?.length > 0) && (
+//   <div className="mb-4 bg-gray-50 border p-3 rounded">
+//     <h3 className="font-semibold text-gray-700">Recommendations</h3> */}
+
+//  {recommendations && (
+//   <div className="mb-4 bg-gray-50 border p-3 rounded">
+//     <h3 className="font-semibold text-gray-700">Recommendations</h3>
+
+//     {/* Description */}
+//     {recommendations.description ? (
+//       <p className="text-gray-600 mb-2">{recommendations.description}</p>
+//     ) : (
+//       <p className="text-gray-500">⚠️ No description available</p>
+//     )}
+
+//     {/* Medications */}
+//     {recommendations.medications && recommendations.medications.length > 0 ? (
+//       <>
+//         <h4 className="font-semibold text-gray-700 mt-2">Medications</h4>
+//         <ul className="list-disc pl-5 text-gray-600">
+//           {recommendations.medications.map((m, i) => (
+//             <li key={i}>{m}</li>
+//           ))}
+//         </ul>
+//       </>
+//     ) : (
+//       <p className="text-gray-500">⚠️ No medications found</p>
+//     )}
+
+//     {/* Diets */}
+//     {recommendations.diets && recommendations.diets.length > 0 ? (
+//       <>
+//         <h4 className="font-semibold text-gray-700 mt-2">Diets</h4>
+//         <ul className="list-disc pl-5 text-gray-600">
+//           {recommendations.diets.map((d, i) => (
+//             <li key={i}>{d}</li>
+//           ))}
+//         </ul>
+//       </>
+//     ) : (
+//       <p className="text-gray-500">⚠️ No diets found</p>
+//     )}
+
+//     {/* Workout */}
+//     {recommendations.workout && recommendations.workout.length > 0 ? (
+//       <>
+//         <h4 className="font-semibold text-gray-700 mt-2">Workout</h4>
+//         <ul className="list-disc pl-5 text-gray-600">
+//           {recommendations.workout.map((w, i) => (
+//             <li key={i}>{w}</li>
+//           ))}
+//         </ul>
+//       </>
+//     ) : (
+//       <p className="text-gray-500">⚠️ No workout recommendations</p>
+//     )}
+//   </div>
+// )}
+
+
+
+
+
+
+//             {/* Manual QR ID */}
+//             {/* <div className="mb-4">
+//               <label className="block font-medium mb-1">Manual QR ID (optional)</label>
+//               <input
+//                 type="text"
+//                 placeholder="Enter manual QR ID if any"
+//                 value={formData.manualQRId || ""}
+//                 onChange={(e) =>
+//                   setFormData({ ...formData, manualQRId: e.target.value })
+//                 }
+//                 className="border rounded p-2 w-full"
+//               />
+//             </div> */}
+
+//             {/* Medicines */}
+//             <div className="mb-4">
+//               <label className="block font-medium">Medicines</label>
+//               {formData.medicines.map((med, index) => (
+//                 <div key={index} className="flex gap-2 mb-2 relative">
+//                   <div className="relative flex-1">
+//                     <input
+//                       type="text"
+//                       placeholder="Medicine Name"
+//                       value={med.name}
+//                       onChange={(e) => {
+//                         handleMedicineChange(index, "name", e.target.value);
+//                         fetchMedicineSuggestions(e.target.value, index);
+//                       }}
+//                       className="border p-2 w-full rounded"
+//                       required
+//                     />
+//                     {medicineSuggestions[index]?.length > 0 && (
+//                       <ul className="absolute bg-white border rounded mt-1 max-h-40 overflow-y-auto w-full z-10">
+//                         {medicineSuggestions[index].map((s) => (
+//                           <li
+//                             key={s}
+//                             onClick={() => {
+//                               handleMedicineChange(index, "name", s);
+//                               setMedicineSuggestions((prev) => ({...prev, [index]:[]}));
+//                             }}
+//                             className="p-2 hover:bg-gray-200 cursor-pointer"
+//                           >
+//                             {s}
+//                           </li>
+//                         ))}
+//                       </ul>
+//                     )}
+//                   </div>
+//                   <input
+//                     type="text"
+//                     placeholder="Dosage"
+//                     value={med.dosage}
+//                     onChange={(e) => handleMedicineChange(index, "dosage", e.target.value)}
+//                     className="border p-2 flex-1 rounded"
+//                     required
+//                   />
+//                   {index > 0 && (
+//                     <button
+//                       type="button"
+//                       onClick={() => removeMedicine(index)}
+//                       className="bg-red-500 text-white px-2 rounded"
+//                     >
+//                       ✕
+//                     </button>
+//                   )}
+//                 </div>
+//               ))}
+//               <button type="button" onClick={addMedicine} className="text-blue-500">
+//                 ➕ Add Medicine
+//               </button>
+//             </div>
+
+//             <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded w-full">
+//               Send Prescription
+//             </button>
+//           </form>
+
+//           {/* QR Code */}
+//           {qrCode && (
+//             <div className="mt-6 text-center">
+//               <img
+//                 src={`data:image/png;base64,${qrCode}`}
+//                 alt="Prescription QR"
+//                 className="mx-auto w-40 h-40"
+//               />
+//               <p className="mt-2 text-green-600">{successMsg}</p>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PrescriptionPage;
+
+
+
+
+
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPrescription, getDoctorProfile } from "../../services/doctorService";
@@ -3024,6 +3857,15 @@ const PrescriptionPage = () => {
   });
   const [qrCode, setQrCode] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
+
+  // ✅ NEW state for recommendations
+  const [recommendations, setRecommendations] = useState({
+    description: "",
+    medications: [],
+    diets: [],
+    workout: []
+  });
+  const [showRecommendations, setShowRecommendations] = useState(false); // toggle display
 
   // Patient search states
   const [searchQuery, setSearchQuery] = useState("");
@@ -3131,14 +3973,63 @@ const PrescriptionPage = () => {
         body: JSON.stringify({ text: query}),
       });
       const data = await res.json();
-      console.log("🔎 Suggestions from API:", data);
-      //setMedicineSuggestions(data.suggestions || []);
-          setMedicineSuggestions((prev) => ({
-      ...prev,
-      [index]: data.suggestions || [],
-    }));
+      setMedicineSuggestions((prev) => ({
+        ...prev,
+        [index]: data.suggestions || [],
+      }));
     } catch (error) {
       console.error("Error fetching medicine suggestions:", error);
+    }
+  };
+
+  // ✅ Updated fetchRecommendations with showRecommendations
+  const fetchRecommendations = async (diseaseName) => {
+    if (!diseaseName || diseaseName.length < 2) {
+      setRecommendations({
+        description: "",
+        medications: [],
+        diets: [],
+        workout: []
+      });
+      setShowRecommendations(false); // hide recommendations if input is empty
+      return;
+    }
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/predict_by_disease", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ disease_name: diseaseName })
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        setRecommendations({
+          description: "❌ No info found",
+          medications: [],
+          diets: [],
+          workout: []
+        });
+        setShowRecommendations(false);
+      } else {
+        setRecommendations({
+          description: data.description || "",
+          medications: data.medications || [],
+          diets: data.diets || [],
+          workout: data.workout || []
+        });
+        setShowRecommendations(true); // show recommendations
+      }
+    } catch (err) {
+      console.error("Error fetching recommendations:", err);
+      setRecommendations({
+        description: "⚠️ Failed to fetch",
+        medications: [],
+        diets: [],
+        workout: []
+      });
+      setShowRecommendations(false);
     }
   };
 
@@ -3237,26 +4128,58 @@ const PrescriptionPage = () => {
                 type="text"
                 placeholder="Enter diagnosis or disease"
                 value={formData.diagnosis}
-                onChange={(e) =>
-                  setFormData({ ...formData, diagnosis: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData({ ...formData, diagnosis: value });
+                  fetchRecommendations(value); // 👈 fetch recommendations on typing
+                }}
                 className="border rounded p-2 w-full"
               />
             </div>
-            {/* Manual QR ID */}
-<div className="mb-4">
-  <label className="block font-medium mb-1">Manual QR ID (optional)</label>
-  <input
-    type="text"
-    placeholder="Enter manual QR ID if any"
-    value={formData.manualQRId || ""}
-    onChange={(e) =>
-      setFormData({ ...formData, manualQRId: e.target.value })
-    }
-    className="border rounded p-2 w-full"
-  />
-</div>
 
+            {/* ✅ Conditional Recommendations Section */}
+            {showRecommendations && (
+              <div className="mb-4 bg-gray-50 border p-3 rounded">
+                <h3 className="font-semibold text-gray-700">Recommendations</h3>
+
+                {recommendations.description && (
+                  <p className="text-gray-600 mb-2">{recommendations.description}</p>
+                )}
+
+                {recommendations.medications?.length > 0 && (
+                  <>
+                    <h4 className="font-semibold text-gray-700 mt-2">Medications</h4>
+                    <ul className="list-disc pl-5 text-gray-600">
+                      {recommendations.medications.map((m, i) => (
+                        <li key={i}>{m}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {recommendations.diets?.length > 0 && (
+                  <>
+                    <h4 className="font-semibold text-gray-700 mt-2">Diets</h4>
+                    <ul className="list-disc pl-5 text-gray-600">
+                      {recommendations.diets.map((d, i) => (
+                        <li key={i}>{d}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {recommendations.workout?.length > 0 && (
+                  <>
+                    <h4 className="font-semibold text-gray-700 mt-2">Workout</h4>
+                    <ul className="list-disc pl-5 text-gray-600">
+                      {recommendations.workout.map((w, i) => (
+                        <li key={i}>{w}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Medicines */}
             <div className="mb-4">
@@ -3282,7 +4205,7 @@ const PrescriptionPage = () => {
                             key={s}
                             onClick={() => {
                               handleMedicineChange(index, "name", s);
-                              setMedicineSuggestions((prev) => ({...prev, [index]:[]}));
+                              setMedicineSuggestions((prev) => ({...prev, [index]:[]})); 
                             }}
                             className="p-2 hover:bg-gray-200 cursor-pointer"
                           >
@@ -3339,193 +4262,3 @@ const PrescriptionPage = () => {
 };
 
 export default PrescriptionPage;
-
-// import React, { useEffect, useState, useRef } from "react";
-// import Sidebar from "../../components/dashboard/Sidebar";
-// import api from "../../services/api";
-// import { createPrescription, getDoctorProfile } from "../../services/doctorService";
-// import * as jwt_decode from "jwt-decode";
-
-// const BACKEND_URL = "http://localhost:5099";
-
-// const PrescriptionPage = () => {
-//   const [loading, setLoading] = useState(true);
-//   const [doctorInfo, setDoctorInfo] = useState({});
-//   const [formData, setFormData] = useState({
-//     patientId: "",
-//     hospitalId: "",
-//     diagnosis: "",
-//     medicines: [{ name: "", dosage: "" }]
-//   });
-//   const [qrCode, setQrCode] = useState(null);
-//   const [successMsg, setSuccessMsg] = useState("");
-
-//   // Patient search
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [searchResults, setSearchResults] = useState([]);
-//   const [selectedPatient, setSelectedPatient] = useState(null);
-//   const searchTimeout = useRef(null);
-
-//   // Medicine suggestions
-//   const [medicineSuggestions, setMedicineSuggestions] = useState([]);
-
-//   // Fetch doctor profile once
-//   useEffect(() => {
-//     const fetchProfile = async () => {
-//       try {
-//         const profile = await getDoctorProfile();
-//         let hospitalId = profile.hospitalId;
-
-//         if (!hospitalId) {
-//           const token = localStorage.getItem("token");
-//           if (token) {
-//             const decoded = jwt_decode.default(token);
-//             hospitalId = decoded["hospitalId"] || "";
-//           }
-//         }
-
-//         setDoctorInfo(profile);
-//         setFormData(prev => ({ ...prev, hospitalId: hospitalId || "" }));
-//       } catch (err) {
-//         console.error("Error fetching profile:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchProfile();
-//   }, []);
-
-//   // Debounced patient search
-//   const handleSearch = (value) => {
-//     setSearchQuery(value);
-//     setSelectedPatient(null);
-
-//     if (searchTimeout.current) clearTimeout(searchTimeout.current);
-//     if (value.trim().length < 2) {
-//       setSearchResults([]);
-//       return;
-//     }
-
-//     searchTimeout.current = setTimeout(async () => {
-//       try {
-//         const res = await api.get(`/doctor/search-patients?query=${value}`);
-//         setSearchResults(Array.isArray(res.data) ? res.data : []);
-//       } catch (err) {
-//         console.error(err);
-//         setSearchResults([]);
-//       }
-//     }, 500);
-//   };
-
-//   const selectPatient = (patient) => {
-//     setSelectedPatient(patient);
-//     setSearchQuery(patient.name);
-//     setFormData(prev => ({ ...prev, patientId: patient.id }));
-//     setSearchResults([]);
-//   };
-
-//   const handleMedicineChange = (index, field, value) => {
-//     const updated = [...formData.medicines];
-//     updated[index][field] = value;
-//     setFormData({ ...formData, medicines: updated });
-//   };
-
-//   const addMedicine = () => {
-//     setFormData(prev => ({
-//       ...prev,
-//       medicines: [...prev.medicines, { name: "", dosage: "" }]
-//     }));
-//   };
-
-//   const removeMedicine = (index) => {
-//     setFormData(prev => ({
-//       ...prev,
-//       medicines: prev.medicines.filter((_, i) => i !== index)
-//     }));
-//   };
-
-//   const fetchMedicineSuggestions = async (query, index) => {
-//     if (query.length < 2) return setMedicineSuggestions(prev => ({ ...prev, [index]: [] }));
-
-//     try {
-//       const res = await fetch("http://127.0.0.1:5000/autocomplete", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ text: query })
-//       });
-//       const data = await res.json();
-//       setMedicineSuggestions(prev => ({ ...prev, [index]: data.suggestions || [] }));
-//     } catch (err) {
-//       console.error(err);
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setSuccessMsg("");
-//     setQrCode(null);
-
-//     try {
-//       const res = await createPrescription(formData);
-//       if (res.qrCode) {
-//         setQrCode(res.qrCode);
-//         setSuccessMsg("✅ Prescription sent successfully!");
-//       }
-//     } catch (err) {
-//       console.error(err);
-//       alert("❌ Failed to create prescription");
-//     }
-//   };
-
-//   if (loading) return <div className="p-6">⏳ Loading prescription page...</div>;
-
-//   const profileImage = doctorInfo.profileImageUrl
-//     ? doctorInfo.profileImageUrl.startsWith("http")
-//       ? doctorInfo.profileImageUrl
-//       : `${BACKEND_URL}${doctorInfo.profileImageUrl}?t=${Date.now()}`
-//     : "/default-doctor.png";
-
-//   return (
-//     <div className="flex min-h-screen bg-gray-100">
-//       <Sidebar doctor={doctorInfo} />
-
-//       <div className="flex-1 p-6">
-//         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
-//           {/* Hospital Info */}
-//           <div className="text-center border-b pb-3">
-//             <h1 className="text-2xl font-bold">{doctorInfo.hospitalName}</h1>
-//             <p className="text-gray-600">{doctorInfo.hospitalAddress}</p>
-//           </div>
-
-//           {/* Doctor Info */}
-//           <div className="flex justify-between mt-4 border-b pb-3">
-//             <div>
-//               <p className="font-semibold">{doctorInfo.fullName}</p>
-//               <p className="text-gray-600">{doctorInfo.specialty}</p>
-//             </div>
-//             {doctorInfo.signatureUrl && (
-//               <img
-//                 src={doctorInfo.signatureUrl.startsWith("http") ? doctorInfo.signatureUrl : `${BACKEND_URL}${doctorInfo.signatureUrl}?t=${Date.now()}`}
-//                 alt="Doctor Signature"
-//                 className="h-12"
-//               />
-//             )}
-//           </div>
-
-//           {/* Prescription Form */}
-//           {/* ... keep your form JSX as-is ... */}
-
-//           {/* QR Code */}
-//           {qrCode && (
-//             <div className="mt-6 text-center">
-//               <img src={`data:image/png;base64,${qrCode}`} alt="Prescription QR" className="mx-auto w-40 h-40" />
-//               <p className="mt-2 text-green-600">{successMsg}</p>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default PrescriptionPage;
