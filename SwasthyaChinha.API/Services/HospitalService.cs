@@ -57,88 +57,25 @@ namespace SwasthyaChinha.API.Services
                 }).ToListAsync();
         }
 
-        public async Task<List<PatientStatsDTO>> GetPatientStatsAsync(string hospitalId)
-        {
-            if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
-                throw new ArgumentException("Invalid hospitalId format");
-
-            var stats = await _context.Prescriptions
-                .Where(p => p.HospitalId == hospitalGuid)
-                .GroupBy(p => p.PatientId)
-                .Select(g => new PatientStatsDTO
-                {
-                    PatientId = g.Key.ToString(),
-                    TotalVisits = g.Count(),
-                    TotalExpense = g.Sum(p => p.TotalCost) ??0
-                }).ToListAsync();
-
-            return stats;
-        }
-
-        // public async Task<HospitalStatsDTO> GetOverallStatsAsync(string hospitalId)
-        // {
-        //     if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
-        //         throw new ArgumentException("Invalid hospitalId format");
-        //          var today = DateTime.Today;
-
-        //     var prescriptions = await _context.Prescriptions
-        //         .Where(p => p.HospitalId == hospitalGuid)
-        //         .ToListAsync();
-
-
-        //     var hospitalUser = await _context.Users
-        // .FirstOrDefaultAsync(u => u.HospitalId == hospitalGuid && u.Role =="HospitalAdmin");
-
-        //     return new HospitalStatsDTO
-        //     {
-
-        //         TotalDoctors = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Doctor"),
-        //         TotalPrescriptionsIssued = prescriptions.Count,
-        //         PrescriptionsVerifiedToday = prescriptions.Count(p => p.IsDispensed && p.CreatedAt.Date == today),
-        //         ActivePrescriptions = prescriptions.Count(p => !p.IsDispensed),
-        //         QRCodesGeneratedToday = prescriptions.Count(p => p.CreatedAt.Date == today),
-        //         TotalPatients = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Patient"),
-        //         TotalExpense = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
-        //         UniquePatients = prescriptions.Select(p => p.PatientId).Distinct().Count(),
-        //         TotalRevenue = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
-        //         HospitalName = hospital?.Name ?? "Unknown",
-        //         Address = hospital?.Address ?? "Not Provided",
-        //         LogoUrl = hospitalUser?.LogoUrl ?? ""
-        //     };
-        // }
-        //         public async Task<HospitalStatsDTO> GetOverallStatsAsync(string hospitalId)
+        // public async Task<List<PatientStatsDTO>> GetPatientStatsAsync(string hospitalId)
         // {
         //     if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
         //         throw new ArgumentException("Invalid hospitalId format");
 
-        //     var today = DateTime.Today;
-
-        //     var prescriptions = await _context.Prescriptions
+        //     var stats = await _context.Prescriptions
         //         .Where(p => p.HospitalId == hospitalGuid)
-        //         .ToListAsync();
+        //         .GroupBy(p => p.PatientId)
+        //         .Select(g => new PatientStatsDTO
+        //         {
+        //             PatientId = g.Key.ToString(),
+        //             TotalVisits = g.Count(),
+        //             TotalExpense = g.Sum(p => p.TotalCost) ?? 0
+        //         }).ToListAsync();
 
-        //     // ✅ Fetch hospital from Hospitals table
-        //     var hospital = await _context.Hospitals
-        //         .FirstOrDefaultAsync(h => h.Id == hospitalGuid);
-
-        //     return new HospitalStatsDTO
-        //     {
-        //         TotalDoctors = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Doctor"),
-        //         TotalPrescriptionsIssued = prescriptions.Count,
-        //         PrescriptionsVerifiedToday = prescriptions.Count(p => p.IsDispensed && p.CreatedAt.Date == today),
-        //         ActivePrescriptions = prescriptions.Count(p => !p.IsDispensed),
-        //         QRCodesGeneratedToday = prescriptions.Count(p => p.CreatedAt.Date == today),
-        //         TotalPatients = await _context.Users.CountAsync(u => u.HospitalId == hospitalGuid && u.Role == "Patient"),
-        //         TotalExpense = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
-        //         UniquePatients = prescriptions.Select(p => p.PatientId).Distinct().Count(),
-        //         TotalRevenue = prescriptions.Sum(p => (decimal?)p.TotalCost) ?? 0,
-
-        //         // ✅ From Hospital table
-        //         HospitalName = hospital?.Name ?? "Unknown",
-        //         Address = hospital?.Address ?? "Not Provided",
-        //         LogoUrl = hospitalUser?.LogoUrl ?? ""   // works if you added LogoUrl to Hospital.cs
-        //     };
+        //     return stats;
         // }
+
+        
         public async Task<HospitalStatsDTO> GetOverallStatsAsync(string hospitalId)
         {
             if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
@@ -149,14 +86,14 @@ namespace SwasthyaChinha.API.Services
             // var prescriptions = await _context.Prescriptions
             //     .Where(p => p.HospitalId == hospitalGuid)
             //     .ToListAsync();
-              var hospital = await _context.Hospitals
-        .FirstOrDefaultAsync(h => h.Id == hospitalGuid);
+            var hospital = await _context.Hospitals
+      .FirstOrDefaultAsync(h => h.Id == hospitalGuid);
             // ✅ Get HospitalAdmin user for this hospital
             var hospitalUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.HospitalId == hospitalGuid && u.Role == "HospitalAdmin");
-                    var prescriptions = await _context.Prescriptions
-        .Where(p => p.HospitalId == hospitalGuid)
-        .ToListAsync();
+            var prescriptions = await _context.Prescriptions
+.Where(p => p.HospitalId == hospitalGuid)
+.ToListAsync();
 
             return new HospitalStatsDTO
             {
@@ -192,16 +129,46 @@ namespace SwasthyaChinha.API.Services
                 }).ToListAsync();
         }
 
-        public async Task<List<PatientStatsDTO>> GetAllPatientsAsync()
-        {
-            return await _context.Prescriptions
-                .GroupBy(p => p.PatientId)
-                .Select(g => new PatientStatsDTO
-                {
-                    PatientId = g.Key.ToString(),
-                    TotalVisits = g.Count(),
-                    TotalExpense = g.Sum(p => p.TotalCost) ??0
-                }).ToListAsync();
-        }
+        // public async Task<List<PatientStatsDTO>> GetAllPatientsAsync()
+        // {
+        //     return await _context.Prescriptions
+        //         .GroupBy(p => p.PatientId)
+        //         .Select(g => new PatientStatsDTO
+        //         {
+        //             PatientId = g.Key.ToString(),
+        //             TotalVisits = g.Count(),
+        //             TotalExpense = g.Sum(p => p.TotalCost) ??0
+        //         }).ToListAsync();
+        // }
+        public async Task<List<PatientFullStatsDTO>> GetPatientStatsAsync(string hospitalId)
+    {
+        return await _context.Prescriptions
+            .Include(p => p.Patient)
+            .ThenInclude(pt => pt.User) // for Email
+            .Where(p => p.HospitalId.ToString() == hospitalId)
+            .GroupBy(p => p.PatientId)
+            .Select(g => new PatientFullStatsDTO
+            {
+                PatientId = g.Key.ToString(),
+                FullName = g.First().Patient.FullName,
+                Email = g.First().Patient.User.Email,
+                TotalVisits = g.Count(),
+                TotalExpense = g.Sum(p => p.TotalCost) ?? 0
+            })
+            .ToListAsync();
+    }
+
+    // ✅ Basic stats
+    public async Task<List<PatientStatsDTO>> GetAllPatientsAsync()
+    {
+        return await _context.Prescriptions
+            .GroupBy(p => p.PatientId)
+            .Select(g => new PatientStatsDTO
+            {
+                PatientId = g.Key.ToString(),
+                TotalVisits = g.Count(),
+                TotalExpense = g.Sum(p => p.TotalCost) ?? 0
+            }).ToListAsync();
+    }
     }
 }

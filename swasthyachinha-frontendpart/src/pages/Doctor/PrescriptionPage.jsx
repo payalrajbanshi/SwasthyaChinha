@@ -4055,7 +4055,7 @@ const PrescriptionPage = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
+      <Sidebar doctor={doctorInfo}/>
       <div className="flex-1 p-6">
         <div className="bg-white p-6 rounded shadow-md max-w-4xl mx-auto border border-gray-300">
           {/* Hospital Info */}

@@ -281,41 +281,208 @@
 //     </div>
 //   );
 // }
-import { useEffect, useState } from "react";
-import api from "../../services/api";
-import Sidebar from "../../components/dashboard/Sidebar";
 
-const BACKEND_URL = "http://localhost:5099"; // Replace with your backend URL if different
+
+
+// import { useEffect, useState } from "react";
+// import api from "../../services/api";
+// import Sidebar from "../../components/dashboard/Sidebar";
+
+
+// const BACKEND_URL = "http://localhost:5099"; // Replace with your backend URL if different
+
+// export default function ProfilePage() {
+//   const [profile, setProfile] = useState(null);
+//   const [formData, setFormData] = useState({ fullName: "", specialty: "", profilePicture: null });
+//   const [previewUrl, setPreviewUrl] = useState(null); // temporary preview
+//   const [loading, setLoading] = useState(true);
+//   const [updating, setUpdating] = useState(false);
+
+//   // Fetch profile
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       try {
+//         const res = await api.get("/doctor/profile");
+//         const data = res.data;
+//          // Convert to camelCase
+//   const doctor = {
+//     id: data.id,
+//     fullName: data.fullName || data.FullName,
+//     email: data.email || data.Email,
+//     specialty: data.specialty || data.Specialty,
+//     hospitalName: data.hospitalName || data.HospitalName,
+//     hospitalAddress: data.hospitalAddress || data.HospitalAddress,
+//     profileImageUrl: data.profileImageUrl || data.ProfileImageUrl,
+//     signatureUrl: data.signatureUrl || data.SignatureUrl,
+//     hospitalId: data.hospitalId || data.HospitalId,
+//   };
+//         setProfile(doctor);
+//         setFormData({
+//           fullName: data.fullName || "",
+//           specialty: data.specialty || "",
+//           profilePicture: null,
+//         });
+//       } catch (err) {
+//         console.error("Failed to load profile:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProfile();
+//   }, []);
+
+//   // Handle input change
+//   const handleChange = (e) => {
+//     const { name, value, files } = e.target;
+//     if (name === "profilePicture" && files?.length > 0) {
+//       setFormData((prev) => ({ ...prev, profilePicture: files[0] }));
+//       setPreviewUrl(URL.createObjectURL(files[0])); // instant preview
+//     } else {
+//       setFormData((prev) => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   // Handle form submit
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setUpdating(true);
+
+//     try {
+//       const data = new FormData();
+//       data.append("FullName", formData.fullName);
+//       data.append("Specialty", formData.specialty);
+//       if (formData.profilePicture) data.append("ProfilePicture", formData.profilePicture);
+
+//       const res = await api.put("/doctor/profile", data, {
+//         headers: { "Content-Type": "multipart/form-data" },
+//       });
+
+//       const updatedProfile = res.data;
+
+//       // Ensure full URL + cache-busting
+//       const profileImageUrl = updatedProfile.profileImageUrl
+//         ? `${BACKEND_URL}${updatedProfile.profileImageUrl}?t=${Date.now()}`
+//         : null;
+
+//       setProfile({ ...updatedProfile, profileImageUrl });
+//       setPreviewUrl(null); // clear temporary preview
+//       setFormData((prev) => ({ ...prev, profilePicture: null }));
+//       alert("Profile updated successfully!");
+//     } catch (err) {
+//       console.error("Update failed:", err);
+//       alert("Failed to update profile. Check console.");
+//     } finally {
+//       setUpdating(false);
+//     }
+//   };
+
+//   if (loading) return <div className="p-10">⏳ Loading profile...</div>;
+//   if (!profile) return <div className="p-10 text-red-600">❌ Failed to load profile.</div>;
+
+//   const displayImage = previewUrl || profile.profileImageUrl || "/default-avatar.png";
+
+//   return (
+//     <div className="flex min-h-screen bg-gray-50">
+//       <Sidebar doctor={{ ...profile, profileImageUrl: displayImage }} />
+
+//       <main className="flex-1 p-10">
+//         <h1 className="text-2xl font-bold mb-6">Manage Profile</h1>
+
+//         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg space-y-4 max-w-lg">
+//           <div className="flex items-center space-x-4">
+//             <img
+//               src={displayImage}
+//               alt="Profile"
+//               className="w-20 h-20 rounded-full object-cover border"
+//             />
+//             <input type="file" name="profilePicture" accept="image/*" onChange={handleChange} />
+//           </div>
+
+//           <div>
+//             <label className="block text-gray-700 mb-1">Full Name</label>
+//             <input
+//               type="text"
+//               name="fullName"
+//               value={formData.fullName || ""}
+//               onChange={handleChange}
+//               className="w-full border p-2 rounded-lg"
+//               required
+//             />
+//           </div>
+
+//           <div>
+//             <label className="block text-gray-700 mb-1">Specialty</label>
+//             <input
+//               type="text"
+//               name="specialty"
+//               value={formData.specialty || ""}
+//               onChange={handleChange}
+//               className="w-full border p-2 rounded-lg"
+//               required
+//             />
+//           </div>
+
+//           <div>
+//             <label className="block text-gray-700 mb-1">Email</label>
+//             <input
+//               type="email"
+//               value={profile.email || ""}
+//               readOnly
+//               className="w-full border p-2 rounded-lg bg-gray-100"
+//             />
+//           </div>
+
+//           <button
+//             type="submit"
+//             disabled={updating}
+//             className={`bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition ${
+//               updating ? "opacity-50 cursor-not-allowed" : ""
+//             }`}
+//           >
+//             {updating ? "Updating..." : "Update Profile"}
+//           </button>
+//         </form>
+//       </main>
+//     </div>
+//   );
+// }
+
+
+import { useEffect, useState } from "react";
+import Sidebar from "../../components/dashboard/Sidebar";
+import { getDoctorProfile } from "../../services/doctorService";
+import api from "../../services/api"; // For PUT request
+import defaultAvatar from "../../assets/doctor.jpg";
+
+const BACKEND_URL = "http://localhost:5099"; // backend URL
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [formData, setFormData] = useState({ fullName: "", specialty: "", profilePicture: null });
-  const [previewUrl, setPreviewUrl] = useState(null); // temporary preview
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
-  // Fetch profile
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await api.get("/doctor/profile");
-        const data = res.data;
-         // Convert to camelCase
-  const doctor = {
-    id: data.id,
-    fullName: data.fullName || data.FullName,
-    email: data.email || data.Email,
-    specialty: data.specialty || data.Specialty,
-    hospitalName: data.hospitalName || data.HospitalName,
-    hospitalAddress: data.hospitalAddress || data.HospitalAddress,
-    profileImageUrl: data.profileImageUrl || data.ProfileImageUrl,
-    signatureUrl: data.signatureUrl || data.SignatureUrl,
-    hospitalId: data.hospitalId || data.HospitalId,
-  };
+        const data = await getDoctorProfile();
+        const doctor = {
+          id: data.id,
+          fullName: data.fullName || data.FullName,
+          email: data.email || data.Email,
+          specialty: data.specialty || data.Specialty,
+          hospitalName: data.hospitalName || data.HospitalName,
+          hospitalAddress: data.hospitalAddress || data.HospitalAddress,
+          profileImageUrl: data.profileImageUrl || data.ProfileImageUrl,
+          signatureUrl: data.signatureUrl || data.SignatureUrl,
+          hospitalId: data.hospitalId || data.HospitalId,
+        };
+
         setProfile(doctor);
         setFormData({
-          fullName: data.fullName || "",
-          specialty: data.specialty || "",
+          fullName: doctor.fullName || "",
+          specialty: doctor.specialty || "",
           profilePicture: null,
         });
       } catch (err) {
@@ -324,21 +491,20 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
+
     fetchProfile();
   }, []);
 
-  // Handle input change
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "profilePicture" && files?.length > 0) {
       setFormData((prev) => ({ ...prev, profilePicture: files[0] }));
-      setPreviewUrl(URL.createObjectURL(files[0])); // instant preview
+      setPreviewUrl(URL.createObjectURL(files[0]));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdating(true);
@@ -354,14 +520,12 @@ export default function ProfilePage() {
       });
 
       const updatedProfile = res.data;
-
-      // Ensure full URL + cache-busting
       const profileImageUrl = updatedProfile.profileImageUrl
         ? `${BACKEND_URL}${updatedProfile.profileImageUrl}?t=${Date.now()}`
         : null;
 
       setProfile({ ...updatedProfile, profileImageUrl });
-      setPreviewUrl(null); // clear temporary preview
+      setPreviewUrl(null);
       setFormData((prev) => ({ ...prev, profilePicture: null }));
       alert("Profile updated successfully!");
     } catch (err) {
@@ -375,7 +539,7 @@ export default function ProfilePage() {
   if (loading) return <div className="p-10">⏳ Loading profile...</div>;
   if (!profile) return <div className="p-10 text-red-600">❌ Failed to load profile.</div>;
 
-  const displayImage = previewUrl || profile.profileImageUrl || "/default-avatar.png";
+  const displayImage = previewUrl || profile.profileImageUrl || defaultAvatar;
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -386,11 +550,7 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg space-y-4 max-w-lg">
           <div className="flex items-center space-x-4">
-            <img
-              src={displayImage}
-              alt="Profile"
-              className="w-20 h-20 rounded-full object-cover border"
-            />
+            <img src={displayImage} alt="Profile" className="w-20 h-20 rounded-full object-cover border" />
             <input type="file" name="profilePicture" accept="image/*" onChange={handleChange} />
           </div>
 

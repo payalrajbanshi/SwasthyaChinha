@@ -614,8 +614,640 @@
 
 
 
+// import { useEffect, useState } from "react";
+// import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Dot } from "recharts";
+// import DoctorList from "../../components/HospitalAdmin/DoctorList";
+// import DoctorForm from "../../components/HospitalAdmin/DoctorForm";
+// import PatientList from "../../components/HospitalAdmin/PatientList";
+// import PrescriptionTable from "../../components/HospitalAdmin/PrescriptionTable";
+// import HospitalProfile from "../../components/HospitalAdmin/HospitalProfile";
+// import { getHospitalStats, getHospitalPrescriptions } from "../../services/hospitalService";
+// import { LayoutDashboard, Users, FileText, Settings, UserPlus } from "lucide-react";
+
+// const Dashboard = () => {
+//   const [stats, setStats] = useState(null);
+//   const [prescriptions, setPrescriptions] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [showDoctorForm, setShowDoctorForm] = useState(false);
+//   const [activeTab, setActiveTab] = useState("dashboard");
+
+//   const hospitalId = localStorage.getItem("hospitalId");
+
+//   useEffect(() => {
+//     const fetchHospitalData = async () => {
+//       if (!hospitalId) return;
+
+//       try {
+//         const statsResp = await getHospitalStats(hospitalId);
+//         setStats(statsResp.data);
+
+//         const prescResp = await getHospitalPrescriptions(hospitalId);
+//         setPrescriptions(Array.isArray(prescResp.data) ? prescResp.data : []);
+//       } catch (err) {
+//         console.error("❌ Error fetching hospital data:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchHospitalData();
+
+//     // -------- Real-time updates using polling (every 10 seconds) --------
+//     const interval = setInterval(fetchHospitalData, 10000);
+//     return () => clearInterval(interval);
+//   }, [hospitalId]);
+
+//   // ------------------- Weekly Prescription Graph (Sunday first, highlight today) -------------------
+//   const getWeeklyPrescriptionData = () => {
+//     const today = new Date();
+//     const data = [];
+
+//     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+//     const currentDay = today.getDay();
+//     const lastSunday = new Date(today);
+//     lastSunday.setDate(today.getDate() - currentDay);
+
+//     for (let i = 0; i < 7; i++) {
+//       const day = new Date(lastSunday);
+//       day.setDate(lastSunday.getDate() + i);
+
+//       const dayStr = daysOfWeek[day.getDay()];
+
+//       const count = prescriptions.filter(
+//         p => new Date(p.Date).toDateString() === day.toDateString()
+//       ).length;
+
+//       data.push({ day: dayStr, prescriptions: count, isToday: day.toDateString() === today.toDateString() });
+//     }
+
+//     return data;
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center h-screen text-green-700 text-lg">
+//         ⏳ Loading Dashboard...
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+//       {/* Sidebar */}
+//       <aside className="w-64 bg-white shadow-lg p-6 rounded-r-2xl">
+//         <h2 className="text-2xl font-extrabold text-green-700 mb-10">SwasthyaChinha</h2>
+//         <nav className="space-y-6">
+//           <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" onClick={() => setActiveTab("dashboard")} />
+//           <NavItem icon={<UserPlus size={20} />} label="Doctors" onClick={() => setActiveTab("doctors")} />
+//           <NavItem icon={<FileText size={20} />} label="Prescription Audit" onClick={() => setActiveTab("prescriptions")} />
+//           <NavItem icon={<Users size={20} />} label="Patients" onClick={() => setActiveTab("patients")} />
+//           <NavItem icon={<Settings size={20} />} label="Settings" onClick={() => setActiveTab("settings")} />
+//         </nav>
+//       </aside>
+
+//       {/* Main Content */}
+//       <main className="flex-1 p-10 space-y-10">
+//         {/* Dashboard stats */}
+//         {activeTab === "dashboard" && (
+//           <>
+//             <HospitalProfile stats={stats} onUpdated={setStats} />
+
+//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//               <StatCard label="Total Doctors" value={stats.totalDoctors} />
+//               <StatCard label="Total Prescriptions Issued" value={stats.totalPrescriptionsIssued} />
+//               <StatCard label="Prescriptions Verified Today" value={stats.prescriptionsVerifiedToday} />
+//               <StatCard label="Active Prescriptions" value={stats.activePrescriptions} />
+//               <StatCard label="QR Codes Generated Today" value={stats.qrCodesGeneratedToday} />
+//             </div>
+
+//             {/* Weekly Prescription Graph */}
+//             <div className="bg-white p-6 rounded-xl shadow-lg mt-6">
+//               <h2 className="text-lg font-semibold mb-3">Weekly Prescriptions</h2>
+//               <ResponsiveContainer width="100%" height={300}>
+//                 <LineChart data={getWeeklyPrescriptionData()}>
+//                   <CartesianGrid strokeDasharray="3 3" />
+//                   <XAxis dataKey="day" />
+//                   <YAxis allowDecimals={false} />
+//                   <Tooltip />
+//                   <Line
+//                     type="monotone"
+//                     dataKey="prescriptions"
+//                     stroke="#22c55e"
+//                     strokeWidth={2}
+//                     dot={(props) => {
+//                       const { cx, cy, payload } = props;
+//                       if (payload.isToday) {
+//                         return <circle cx={cx} cy={cy} r={6} fill="#f59e0b" stroke="#f59e0b" />;
+//                       }
+//                       return <circle cx={cx} cy={cy} r={4} fill="#22c55e" />;
+//                     }}
+//                   />
+//                 </LineChart>
+//               </ResponsiveContainer>
+//             </div>
+//           </>
+//         )}
+
+//         {/* Doctors tab */}
+//         {activeTab === "doctors" && (
+//           <div className="space-y-6">
+//             <div className="bg-white p-6 rounded-xl shadow-lg">
+//               <h2 className="font-semibold text-lg mb-3">Register Doctor</h2>
+//               <button
+//                 onClick={() => setShowDoctorForm(!showDoctorForm)}
+//                 className="bg-green-600 text-white px-5 py-2 rounded-lg shadow hover:bg-green-700 transition"
+//               >
+//                 {showDoctorForm ? "Close Form" : "Add Doctor"}
+//               </button>
+//               {showDoctorForm && (
+//                 <div className="mt-4">
+//                   <DoctorForm hospitalId={hospitalId} onSuccess={() => setShowDoctorForm(false)} />
+//                 </div>
+//               )}
+//             </div>
+//             <DoctorList />
+//           </div>
+//         )}
+
+//         {/* Patients tab */}
+//         {activeTab === "patients" && <PatientList />}
+
+//         {/* Prescription Audit tab */}
+//         {activeTab === "prescriptions" && <PrescriptionTable prescriptions={prescriptions} />}
+
+//         {/* Settings tab */}
+//         {activeTab === "settings" && (
+//           <div className="bg-white p-6 rounded-xl shadow-lg">
+//             <h2 className="text-xl font-semibold">Settings</h2>
+//             <p className="text-gray-500 mt-2">Settings options will go here.</p>
+//           </div>
+//         )}
+//       </main>
+//     </div>
+//   );
+// };
+
+// const NavItem = ({ icon, label, onClick }) => (
+//   <div
+//     onClick={onClick}
+//     className="flex items-center space-x-3 text-gray-700 hover:text-green-600 cursor-pointer transition"
+//   >
+//     {icon}
+//     <span className="font-medium">{label}</span>
+//   </div>
+// );
+
+// const StatCard = ({ label, value }) => (
+//   <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition text-center">
+//     <p className="text-gray-500 text-sm mb-1">{label}</p>
+//     <p className="text-2xl font-bold text-green-700">{value}</p>
+//   </div>
+// );
+
+// export default Dashboard;
+
+
+
+
+
+
+// import { useEffect, useState } from "react";
+// import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+// import DoctorList from "../../components/HospitalAdmin/DoctorList";
+// import DoctorForm from "../../components/HospitalAdmin/DoctorForm";
+// import PatientList from "../../components/HospitalAdmin/PatientList";
+// import PrescriptionTable from "../../components/HospitalAdmin/PrescriptionTable";
+// import HospitalProfile from "../../components/HospitalAdmin/HospitalProfile";
+// import { getHospitalStats, getHospitalPrescriptions } from "../../services/hospitalService";
+// import { LayoutDashboard, Users, FileText, Settings, UserPlus } from "lucide-react";
+
+// const Dashboard = () => {
+//   const [stats, setStats] = useState(null);
+//   const [prescriptions, setPrescriptions] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [showDoctorForm, setShowDoctorForm] = useState(false);
+//   const [activeTab, setActiveTab] = useState("dashboard");
+
+//   const hospitalId = localStorage.getItem("hospitalId");
+
+//   useEffect(() => {
+//     const fetchHospitalData = async () => {
+//       if (!hospitalId) return;
+
+//       try {
+//         const statsResp = await getHospitalStats(hospitalId);
+//         setStats(statsResp.data);
+
+//         const prescResp = await getHospitalPrescriptions(hospitalId);
+//         setPrescriptions(Array.isArray(prescResp.data) ? prescResp.data : []);
+//       } catch (err) {
+//         console.error("❌ Error fetching hospital data:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchHospitalData();
+
+//     // -------- Real-time updates using polling (every 10 seconds) --------
+//     const interval = setInterval(fetchHospitalData, 10000);
+//     return () => clearInterval(interval);
+//   }, [hospitalId]);
+
+//   // ------------------- Weekly Prescription Graph (Issued + Dispensed) -------------------
+//   const getWeeklyPrescriptionData = () => {
+//     const today = new Date();
+//     const data = [];
+
+//     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+//     const currentDay = today.getDay();
+//     const lastSunday = new Date(today);
+//     lastSunday.setDate(today.getDate() - currentDay);
+
+//     for (let i = 0; i < 7; i++) {
+//       const day = new Date(lastSunday);
+//       day.setDate(lastSunday.getDate() + i);
+
+//       const dayStr = daysOfWeek[day.getDay()];
+
+//       const issuedCount = prescriptions.filter(
+//         (p) => new Date(p.Date).toDateString() === day.toDateString()
+//       ).length;
+
+//       const dispensedCount = prescriptions.filter(
+//         (p) =>
+//           p.DispensedDate && // assuming backend returns DispensedDate when dispensed
+//           new Date(p.DispensedDate).toDateString() === day.toDateString()
+//       ).length;
+
+//       data.push({
+//         day: dayStr,
+//         issued: issuedCount,
+//         dispensed: dispensedCount,
+//         isToday: day.toDateString() === today.toDateString(),
+//       });
+//     }
+
+//     return data;
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center h-screen text-green-700 text-lg">
+//         ⏳ Loading Dashboard...
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+//       {/* Sidebar */}
+//       <aside className="w-64 bg-white shadow-lg p-6 rounded-r-2xl">
+//         <h2 className="text-2xl font-extrabold text-green-700 mb-10">SwasthyaChinha</h2>
+//         <nav className="space-y-6">
+//           <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" onClick={() => setActiveTab("dashboard")} />
+//           <NavItem icon={<UserPlus size={20} />} label="Doctors" onClick={() => setActiveTab("doctors")} />
+//           <NavItem icon={<FileText size={20} />} label="Prescription Audit" onClick={() => setActiveTab("prescriptions")} />
+//           <NavItem icon={<Users size={20} />} label="Patients" onClick={() => setActiveTab("patients")} />
+//           <NavItem icon={<Settings size={20} />} label="Settings" onClick={() => setActiveTab("settings")} />
+//         </nav>
+//       </aside>
+
+//       {/* Main Content */}
+//       <main className="flex-1 p-10 space-y-10">
+//         {/* Dashboard stats */}
+//         {activeTab === "dashboard" && (
+//           <>
+//             <HospitalProfile stats={stats} onUpdated={setStats} />
+
+//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//               <StatCard label="Total Doctors" value={stats.totalDoctors} />
+//               <StatCard label="Total Prescriptions Issued" value={stats.totalPrescriptionsIssued} />
+//               <StatCard label="Prescriptions Verified Today" value={stats.prescriptionsVerifiedToday} />
+//               <StatCard label="Active Prescriptions" value={stats.activePrescriptions} />
+//               <StatCard label="QR Codes Generated Today" value={stats.qrCodesGeneratedToday} />
+//             </div>
+
+//             {/* Weekly Prescription Graph */}
+//             <div className="bg-white p-6 rounded-xl shadow-lg mt-6">
+//               <h2 className="text-lg font-semibold mb-3">Weekly Prescriptions</h2>
+//               <ResponsiveContainer width="100%" height={300}>
+//                 <LineChart data={getWeeklyPrescriptionData()}>
+//                   <CartesianGrid strokeDasharray="3 3" />
+//                   <XAxis dataKey="day" />
+//                   <YAxis allowDecimals={false} />
+//                   <Tooltip />
+
+//                   {/* Issued line */}
+//                   <Line
+//                     type="monotone"
+//                     dataKey="issued"
+//                     stroke="#22c55e"
+//                     strokeWidth={2}
+//                     dot={(props) => {
+//                       const { cx, cy, payload } = props;
+//                       if (payload.isToday) {
+//                         return <circle cx={cx} cy={cy} r={6} fill="#f59e0b" stroke="#f59e0b" />;
+//                       }
+//                       return <circle cx={cx} cy={cy} r={4} fill="#22c55e" />;
+//                     }}
+//                     name="Prescriptions Issued"
+//                   />
+
+//                   {/* Dispensed line */}
+//                   <Line
+//                     type="monotone"
+//                     dataKey="dispensed"
+//                     stroke="#3b82f6"
+//                     strokeWidth={2}
+//                     dot={(props) => {
+//                       const { cx, cy, payload } = props;
+//                       if (payload.isToday) {
+//                         return <circle cx={cx} cy={cy} r={6} fill="#ef4444" stroke="#ef4444" />;
+//                       }
+//                       return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" />;
+//                     }}
+//                     name="Prescriptions Dispensed"
+//                   />
+//                 </LineChart>
+//               </ResponsiveContainer>
+//             </div>
+//           </>
+//         )}
+
+//         {/* Doctors tab */}
+//         {activeTab === "doctors" && (
+//           <div className="space-y-6">
+//             <div className="bg-white p-6 rounded-xl shadow-lg">
+//               <h2 className="font-semibold text-lg mb-3">Register Doctor</h2>
+//               <button
+//                 onClick={() => setShowDoctorForm(!showDoctorForm)}
+//                 className="bg-green-600 text-white px-5 py-2 rounded-lg shadow hover:bg-green-700 transition"
+//               >
+//                 {showDoctorForm ? "Close Form" : "Add Doctor"}
+//               </button>
+//               {showDoctorForm && (
+//                 <div className="mt-4">
+//                   <DoctorForm hospitalId={hospitalId} onSuccess={() => setShowDoctorForm(false)} />
+//                 </div>
+//               )}
+//             </div>
+//             <DoctorList />
+//           </div>
+//         )}
+
+//         {/* Patients tab */}
+//         {activeTab === "patients" && <PatientList />}
+
+//         {/* Prescription Audit tab */}
+//         {activeTab === "prescriptions" && <PrescriptionTable prescriptions={prescriptions} />}
+
+//         {/* Settings tab */}
+//         {activeTab === "settings" && (
+//           <div className="bg-white p-6 rounded-xl shadow-lg">
+//             <h2 className="text-xl font-semibold">Settings</h2>
+//             <p className="text-gray-500 mt-2">Settings options will go here.</p>
+//           </div>
+//         )}
+//       </main>
+//     </div>
+//   );
+// };
+
+// const NavItem = ({ icon, label, onClick }) => (
+//   <div
+//     onClick={onClick}
+//     className="flex items-center space-x-3 text-gray-700 hover:text-green-600 cursor-pointer transition"
+//   >
+//     {icon}
+//     <span className="font-medium">{label}</span>
+//   </div>
+// );
+
+// const StatCard = ({ label, value }) => (
+//   <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition text-center">
+//     <p className="text-gray-500 text-sm mb-1">{label}</p>
+//     <p className="text-2xl font-bold text-green-700">{value}</p>
+//   </div>
+// );
+
+// export default Dashboard;
+
+
+// import { useEffect, useState } from "react";
+// import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+// import DoctorList from "../../components/HospitalAdmin/DoctorList";
+// import DoctorForm from "../../components/HospitalAdmin/DoctorForm";
+// import PatientList from "../../components/HospitalAdmin/PatientList";
+// import PrescriptionTable from "../../components/HospitalAdmin/PrescriptionTable";
+// import HospitalProfile from "../../components/HospitalAdmin/HospitalProfile";
+// import { getHospitalStats, getHospitalPrescriptions } from "../../services/hospitalService";
+// import { LayoutDashboard, Users, FileText, Settings, UserPlus } from "lucide-react";
+
+// const Dashboard = () => {
+//   const [stats, setStats] = useState(null);
+//   const [prescriptions, setPrescriptions] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [showDoctorForm, setShowDoctorForm] = useState(false);
+//   const [activeTab, setActiveTab] = useState("dashboard");
+
+//   const hospitalId = localStorage.getItem("hospitalId");
+
+//   useEffect(() => {
+//     const fetchHospitalData = async () => {
+//       if (!hospitalId) return;
+
+//       try {
+//         const statsResp = await getHospitalStats(hospitalId);
+//         setStats(statsResp.data);
+
+//         const prescResp = await getHospitalPrescriptions(hospitalId);
+//         setPrescriptions(Array.isArray(prescResp.data) ? prescResp.data : []);
+//       } catch (err) {
+//         console.error("❌ Error fetching hospital data:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchHospitalData();
+
+//     // Real-time updates every 10 seconds
+//     const interval = setInterval(fetchHospitalData, 10000);
+//     return () => clearInterval(interval);
+//   }, [hospitalId]);
+
+//   // ------------------- Weekly Prescription Graph (Option 1: CreatedAt + IsDispensed) -------------------
+//   const getWeeklyPrescriptionData = () => {
+//     const today = new Date();
+//     const data = [];
+
+//     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+//     const currentDay = today.getDay();
+//     const lastSunday = new Date(today);
+//     lastSunday.setDate(today.getDate() - currentDay);
+
+//     for (let i = 0; i < 7; i++) {
+//       const day = new Date(lastSunday);
+//       day.setDate(lastSunday.getDate() + i);
+
+//       const dayStr = daysOfWeek[day.getDay()];
+
+//       const issuedCount = prescriptions.filter(
+//         (p) => new Date(p.Date).toDateString().slice(0,10) === day.toDateString().slice(0,10)
+//       ).length;
+
+//       const dispensedCount = prescriptions.filter(
+//         (p) => p.Status=="Dispensed" && new Date(p.Date).toISOString().slice(0,10) === day.toISOString().slice(0,10)
+//       ).length;
+
+//       data.push({
+//         day: dayStr,
+//         issued: issuedCount,
+//         dispensed: dispensedCount,
+//         isToday: day.toDateString() === today.toDateString(),
+//       });
+//     }
+
+//     return data;
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center h-screen text-green-700 text-lg">
+//         ⏳ Loading Dashboard...
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+//       {/* Sidebar */}
+//       <aside className="w-64 bg-white shadow-lg p-6 rounded-r-2xl">
+//         <h2 className="text-2xl font-extrabold text-green-700 mb-10">SwasthyaChinha</h2>
+//         <nav className="space-y-6">
+//           <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" onClick={() => setActiveTab("dashboard")} />
+//           <NavItem icon={<UserPlus size={20} />} label="Doctors" onClick={() => setActiveTab("doctors")} />
+//           <NavItem icon={<FileText size={20} />} label="Prescription Audit" onClick={() => setActiveTab("prescriptions")} />
+//           <NavItem icon={<Users size={20} />} label="Patients" onClick={() => setActiveTab("patients")} />
+//           <NavItem icon={<Settings size={20} />} label="Settings" onClick={() => setActiveTab("settings")} />
+//         </nav>
+//       </aside>
+
+//       {/* Main Content */}
+//       <main className="flex-1 p-10 space-y-10">
+//         {activeTab === "dashboard" && (
+//           <>
+//             <HospitalProfile stats={stats} onUpdated={setStats} />
+
+//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+//               <StatCard label="Total Doctors" value={stats.totalDoctors} />
+//               <StatCard label="Total Prescriptions Issued" value={stats.totalPrescriptionsIssued} />
+//               <StatCard label="Prescriptions Verified Today" value={stats.prescriptionsVerifiedToday} />
+//               <StatCard label="Active Prescriptions" value={stats.activePrescriptions} />
+//               <StatCard label="QR Codes Generated Today" value={stats.qrCodesGeneratedToday} />
+//             </div>
+
+//             {/* Weekly Prescription Graph */}
+//             <div className="bg-white p-6 rounded-xl shadow-lg mt-6">
+//               <h2 className="text-lg font-semibold mb-3">Weekly Prescriptions</h2>
+//               <ResponsiveContainer width="100%" height={300}>
+//                 <LineChart data={getWeeklyPrescriptionData()}>
+//                   <CartesianGrid strokeDasharray="3 3" />
+//                   <XAxis dataKey="day" />
+//                   <YAxis allowDecimals={false} />
+//                   <Tooltip />
+
+//                   {/* Issued line */}
+//                   <Line
+//                     type="monotone"
+//                     dataKey="issued"
+//                     stroke="#22c55e"
+//                     strokeWidth={2}
+//                     dot={(props) => {
+//                       const { cx, cy, payload } = props;
+//                       if (payload.isToday) return <circle cx={cx} cy={cy} r={6} fill="#f59e0b" stroke="#f59e0b" />;
+//                       return <circle cx={cx} cy={cy} r={4} fill="#22c55e" />;
+//                     }}
+//                     name="Prescriptions Issued"
+//                   />
+
+//                   {/* Dispensed line */}
+//                   <Line
+//                     type="monotone"
+//                     dataKey="dispensed"
+//                     stroke="#3b82f6"
+//                     strokeWidth={2}
+//                     dot={(props) => {
+//                       const { cx, cy, payload } = props;
+//                       if (payload.isToday) return <circle cx={cx} cy={cy} r={6} fill="#ef4444" stroke="#ef4444" />;
+//                       return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" />;
+//                     }}
+//                     name="Prescriptions Dispensed"
+//                   />
+//                 </LineChart>
+//               </ResponsiveContainer>
+//             </div>
+//           </>
+//         )}
+
+//         {activeTab === "doctors" && (
+//           <div className="space-y-6">
+//             <div className="bg-white p-6 rounded-xl shadow-lg">
+//               <h2 className="font-semibold text-lg mb-3">Register Doctor</h2>
+//               <button
+//                 onClick={() => setShowDoctorForm(!showDoctorForm)}
+//                 className="bg-green-600 text-white px-5 py-2 rounded-lg shadow hover:bg-green-700 transition"
+//               >
+//                 {showDoctorForm ? "Close Form" : "Add Doctor"}
+//               </button>
+//               {showDoctorForm && (
+//                 <div className="mt-4">
+//                   <DoctorForm hospitalId={hospitalId} onSuccess={() => setShowDoctorForm(false)} />
+//                 </div>
+//               )}
+//             </div>
+//             <DoctorList />
+//           </div>
+//         )}
+
+//         {activeTab === "patients" && <PatientList />}
+
+//         {activeTab === "prescriptions" && <PrescriptionTable prescriptions={prescriptions} />}
+
+//         {activeTab === "settings" && (
+//           <div className="bg-white p-6 rounded-xl shadow-lg">
+//             <h2 className="text-xl font-semibold">Settings</h2>
+//             <p className="text-gray-500 mt-2">Settings options will go here.</p>
+//           </div>
+//         )}
+//       </main>
+//     </div>
+//   );
+// };
+
+// const NavItem = ({ icon, label, onClick }) => (
+//   <div
+//     onClick={onClick}
+//     className="flex items-center space-x-3 text-gray-700 hover:text-green-600 cursor-pointer transition"
+//   >
+//     {icon}
+//     <span className="font-medium">{label}</span>
+//   </div>
+// );
+
+// const StatCard = ({ label, value }) => (
+//   <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition text-center">
+//     <p className="text-gray-500 text-sm mb-1">{label}</p>
+//     <p className="text-2xl font-bold text-green-700">{value}</p>
+//   </div>
+// );
+
+// export default Dashboard;
+
+
 import { useEffect, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Dot } from "recharts";
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import DoctorList from "../../components/HospitalAdmin/DoctorList";
 import DoctorForm from "../../components/HospitalAdmin/DoctorForm";
 import PatientList from "../../components/HospitalAdmin/PatientList";
@@ -652,12 +1284,12 @@ const Dashboard = () => {
 
     fetchHospitalData();
 
-    // -------- Real-time updates using polling (every 10 seconds) --------
+    // Real-time updates every 10 seconds
     const interval = setInterval(fetchHospitalData, 10000);
     return () => clearInterval(interval);
   }, [hospitalId]);
 
-  // ------------------- Weekly Prescription Graph (Sunday first, highlight today) -------------------
+  // ------------------- Weekly Prescription Graph -------------------
   const getWeeklyPrescriptionData = () => {
     const today = new Date();
     const data = [];
@@ -673,11 +1305,22 @@ const Dashboard = () => {
 
       const dayStr = daysOfWeek[day.getDay()];
 
-      const count = prescriptions.filter(
-        p => new Date(p.Date).toDateString() === day.toDateString()
+      // Issued prescriptions
+      const issuedCount = prescriptions.filter(
+        (p) => new Date(p.date).toDateString() === day.toDateString()
       ).length;
 
-      data.push({ day: dayStr, prescriptions: count, isToday: day.toDateString() === today.toDateString() });
+      // Dispensed prescriptions
+      const dispensedCount = prescriptions.filter(
+        (p) => p.status === "Dispensed" && new Date(p.date).toDateString() === day.toDateString()
+      ).length;
+
+      data.push({
+        day: dayStr,
+        issued: issuedCount,
+        dispensed: dispensedCount,
+        isToday: day.toDateString() === today.toDateString(),
+      });
     }
 
     return data;
@@ -707,7 +1350,6 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-10 space-y-10">
-        {/* Dashboard stats */}
         {activeTab === "dashboard" && (
           <>
             <HospitalProfile stats={stats} onUpdated={setStats} />
@@ -729,18 +1371,32 @@ const Dashboard = () => {
                   <XAxis dataKey="day" />
                   <YAxis allowDecimals={false} />
                   <Tooltip />
+                  {/* <Legend verticalAlign="middle" align="right" layout="vertical" /> */}
+                  
                   <Line
                     type="monotone"
-                    dataKey="prescriptions"
+                    dataKey="issued"
                     stroke="#22c55e"
                     strokeWidth={2}
                     dot={(props) => {
                       const { cx, cy, payload } = props;
-                      if (payload.isToday) {
-                        return <circle cx={cx} cy={cy} r={6} fill="#f59e0b" stroke="#f59e0b" />;
-                      }
+                      if (payload.isToday) return <circle cx={cx} cy={cy} r={6} fill="#f59e0b" stroke="#f59e0b" />;
                       return <circle cx={cx} cy={cy} r={4} fill="#22c55e" />;
                     }}
+                    name="Prescriptions Issued"
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="dispensed"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    dot={(props) => {
+                      const { cx, cy, payload } = props;
+                      if (payload.isToday) return <circle cx={cx} cy={cy} r={6} fill="#ef4444" stroke="#ef4444" />;
+                      return <circle cx={cx} cy={cy} r={4} fill="#3b82f6" />;
+                    }}
+                    name="Prescriptions Dispensed"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -748,7 +1404,6 @@ const Dashboard = () => {
           </>
         )}
 
-        {/* Doctors tab */}
         {activeTab === "doctors" && (
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl shadow-lg">
@@ -769,13 +1424,10 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Patients tab */}
         {activeTab === "patients" && <PatientList />}
 
-        {/* Prescription Audit tab */}
         {activeTab === "prescriptions" && <PrescriptionTable prescriptions={prescriptions} />}
 
-        {/* Settings tab */}
         {activeTab === "settings" && (
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <h2 className="text-xl font-semibold">Settings</h2>

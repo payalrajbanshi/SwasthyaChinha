@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+numpy
+pandas
+scikit-learn
+
+# if you want to download all the requirements directly
+# pip install -r requirments.txt

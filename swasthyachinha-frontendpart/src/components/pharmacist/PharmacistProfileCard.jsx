@@ -1,3 +1,5 @@
+import pharmacistIcon from "../../assets/phar.png";
+
 export default function PharmacistProfileCard({ pharmacist }) {
   if (!pharmacist) return null;
 
@@ -5,8 +7,8 @@ export default function PharmacistProfileCard({ pharmacist }) {
     <div className="flex items-center gap-4 bg-white p-4 rounded shadow-md mb-6">
       {/* Profile Picture */}
       <img
-        src={pharmacist.profileImageUrl || "/default-avatar.png"}
-        alt="Profile"
+        src={pharmacist.profileImageUrl || pharmacistIcon}
+        alt="Pharmacist"
         className="w-20 h-20 rounded-full object-cover border"
       />
 

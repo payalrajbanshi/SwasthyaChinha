@@ -17,6 +17,13 @@ export const createPrescription = async (payload) => {
   const res = await api.post("/doctor/prescribe", payload);
   return res.data;
 };
+
+// export const updateDoctorProfile = async (formData) => {
+//   const res = await api.put("/doctor/profile", formData, {
+//     headers: { "Content-Type": "multipart/form-data" },
+//   });
+//   return res.data;
+// };
 // src/services/doctorService.js
 // import api from "./api";
 

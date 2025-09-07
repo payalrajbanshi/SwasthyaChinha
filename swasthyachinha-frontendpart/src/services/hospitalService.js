@@ -27,3 +27,6 @@ export const getDoctors = () => api.get(`/hospital/doctors`);
 
 // Get Hospital Patients ✅ (fixed)
 export const getPatients = () => api.get(`/hospital/patients`);
+// ✅ Get full patient stats with Email & Name
+export const getPatientStats = (hospitalId) =>
+  api.get(`/hospital/patient-stats?hospitalId=${hospitalId}`);

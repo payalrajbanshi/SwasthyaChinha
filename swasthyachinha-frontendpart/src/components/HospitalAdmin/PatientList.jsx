@@ -39,6 +39,7 @@
 
 import { useEffect, useState } from "react";
 import { getPatients } from "../../services/hospitalService";
+import { getPatientStats } from "../../services/hospitalService";
 
 const PatientList = () => {
   const [patients, setPatients] = useState([]);
@@ -47,7 +48,7 @@ const PatientList = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const { data } = await getPatients(); // ✅ no hospitalId param
+        const { data } = await getPatientStats(hospitalId); // ✅ no hospitalId param
         setPatients(data);
       } catch (err) {
         console.error("❌ Failed to fetch patients:", err);
@@ -72,8 +73,12 @@ const PatientList = () => {
       {patients.length > 0 ? (
         <ul className="space-y-2">
           {patients.map((p) => (
-            <li key={p.id} className="border p-3 rounded">
-              {p.fullName} – {p.email || "No email"}
+            <li key={p.patientid} className="border p-3 rounded">
+              {/* {p.FullName} – {p.email || "No email"} */}
+               {/* {p.fullName || p.FullName} – {p.email || p.Email || "No email"} */}
+               {p.fullName} – {p.email || p.username || "No email"}
+
+               
             </li>
           ))}
         </ul>

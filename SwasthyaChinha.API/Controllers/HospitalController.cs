@@ -102,27 +102,52 @@ namespace SwasthyaChinha.API.Controllers
             return Ok(patients);
         }
         [Authorize(Roles = "hospitaladmin")]
-[HttpGet("prescriptions")]
-public async Task<IActionResult> GetHospitalPrescriptions([FromQuery] string hospitalId)
+        [HttpGet("prescriptions")]
+        public async Task<IActionResult> GetHospitalPrescriptions([FromQuery] string hospitalId)
+        {
+            if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
+                return BadRequest("Invalid hospitalId");
+
+            var prescriptions = await _context.Prescriptions
+                .Include(p => p.Doctor)
+                .Include(p => p.Patient)
+                .Where(p => p.HospitalId == hospitalGuid)
+                .OrderByDescending(p => p.CreatedAt)
+                .Select(p => new
+                {
+                    Date = p.CreatedAt,
+                    Doctor = p.Doctor.FullName,
+                    Patient = p.Patient.FullName,
+                    Status = p.IsDispensed ? "Dispensed" : "Active"
+                })
+                .ToListAsync();
+
+            return Ok(prescriptions);
+        }
+[Authorize(Roles = "hospitaladmin")]
+[HttpPut("{hospitalId}")]
+public async Task<IActionResult> UpdateHospital([FromRoute] string hospitalId, [FromBody] UpdateHospitalDTO dto)
 {
     if (!Guid.TryParse(hospitalId, out Guid hospitalGuid))
         return BadRequest("Invalid hospitalId");
 
-    var prescriptions = await _context.Prescriptions
-        .Include(p => p.Doctor)
-        .Include(p => p.Patient)
-        .Where(p => p.HospitalId == hospitalGuid)
-        .OrderByDescending(p => p.CreatedAt)
-        .Select(p => new {
-            Date = p.CreatedAt,
-            Doctor = p.Doctor.FullName,
-            Patient = p.Patient.FullName,
-            Status = p.IsDispensed ? "Dispensed" : "Active"
-        })
-        .ToListAsync();
+    var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Id == hospitalGuid);
+    if (hospital == null) return NotFound("Hospital not found");
 
-    return Ok(prescriptions);
+    // Update fields
+    hospital.Name = dto.HospitalName ?? hospital.Name;
+    hospital.Address = dto.Address ?? hospital.Address;
+
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        hospital.Id,
+        hospital.Name,
+        hospital.Address
+    });
 }
+
 
     }
 }
